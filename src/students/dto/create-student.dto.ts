@@ -38,4 +38,12 @@ export class CreateStudentDto {
   @IsNotEmpty()
   @Length(8, 128)
   password: string;
+
+  @ApiProperty({
+    name: 'classID',
+    example: '3ce64d70-0716-474d-8c2b-9f0d1d9a0b45',
+  })
+  @IsNotEmpty()
+  @IsString()
+  classID?: string;
 }

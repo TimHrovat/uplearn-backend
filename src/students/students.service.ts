@@ -8,18 +8,12 @@ import * as bcrypt from 'bcrypt';
 export class StudentsService {
   constructor(private prisma: PrismaService) {}
 
-  async create({
-    name,
-    surname,
-    dateOfBirth,
-    email,
-    password,
-  }: CreateStudentDto) {
-    const hashedPassword = await this.hashPassword(password);
+  async create(createStudentDto: CreateStudentDto) {
+    const hashedPassword = await this.hashPassword(createStudentDto.password);
 
     try {
       const newStudent = await this.prisma.student.create({
-        data: { name, surname, dateOfBirth, email, password: hashedPassword },
+        data: { ...createStudentDto, password: hashedPassword },
       });
       return newStudent;
     } catch (e) {
@@ -37,7 +31,7 @@ export class StudentsService {
 
   async update(
     id: string,
-    { name, surname, dateOfBirth, email, password, classId }: UpdateStudentDto,
+    { name, surname, dateOfBirth, email, password, classID }: UpdateStudentDto,
   ) {
     try {
       const hashedPassword = await this.hashPassword(password);
@@ -50,7 +44,7 @@ export class StudentsService {
           dateOfBirth,
           email,
           password: hashedPassword,
-          classId,
+          classID,
         },
       });
 

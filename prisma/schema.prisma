@@ -20,8 +20,8 @@ model Student {
   password  String
   createdAt DateTime @default(now())
 
-  class   Class?  @relation(fields: [classId], references: [id])
-  classId String?
+  class   Class?  @relation(fields: [classID], references: [id])
+  classID String?
 }
 
 model Employee {
