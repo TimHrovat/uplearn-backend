@@ -27,11 +27,20 @@ export class ClassesService {
     return this.prisma.class.findUnique({ where: { id } });
   }
 
-  update(id: string, updateClassDto: UpdateClassDto) {
-    return `This action updates a #${id} class`;
+  async update(id: string, updateClassDto: UpdateClassDto) {
+    try {
+      const updatedClass = await this.prisma.class.update({
+        where: { id },
+        data: updateClassDto,
+      });
+
+      return updatedClass;
+    } catch (e) {
+      console.log(e); //!fix this
+    }
   }
 
   remove(id: string) {
-    return `This action removes a #${id} class`;
+    return this.prisma.class.delete({ where: { id } });
   }
 }
