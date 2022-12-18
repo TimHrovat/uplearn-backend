@@ -40,6 +40,21 @@ export class EmployeesController {
     return this.employeesService.update(id, updateEmployeeDto);
   }
 
+  @Patch(':employeeID/:subjectID')
+  teachesSubject(
+    @Param('employeeID') employeeID: string,
+    @Param('subjectID') subjectID: string,
+  ) {
+    return this.employeesService.teachesSubject(employeeID, subjectID);
+  }
+
+  @Get('/findByAbbr/:subjectAbbreviation')
+  allEmployeesWhoTeachSubject(
+    @Param('subjectAbbreviation') abbreviation: string,
+  ) {
+    return this.employeesService.allEmployeesWhoTeachSubject(abbreviation);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.employeesService.remove(id);

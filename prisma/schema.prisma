@@ -57,10 +57,10 @@ model Subject {
 
 model TeachesSubject {
   employee   Employee @relation(fields: [employeeID], references: [id])
-  employeeID String   @unique
+  employeeID String
 
   subject   Subject @relation(fields: [subjectID], references: [id])
-  subjectID String  @unique
+  subjectID String
 
   Lesson       Lesson[]
   TeachesClass TeachesClass[]

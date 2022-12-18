@@ -64,6 +64,33 @@ export class EmployeesService {
     }
   }
 
+  async teachesSubject(employeeID: string, subjectID: string) {
+    try {
+      const newConnection = await this.prisma.teachesSubject.create({
+        data: {
+          employeeID,
+          subjectID,
+        },
+      });
+
+      return newConnection;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async allEmployeesWhoTeachSubject(abbreviation: string) {
+    return await this.prisma.employee.findMany({
+      where: {
+        teaches: {
+          some: {
+            subject: { abbreviation: abbreviation },
+          },
+        },
+      },
+    });
+  }
+
   remove(id: string) {
     return this.prisma.employee.delete({ where: { id } });
   }
