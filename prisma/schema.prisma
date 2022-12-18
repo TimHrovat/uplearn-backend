@@ -48,10 +48,11 @@ enum EmployeeRole {
 }
 
 model Subject {
-  id          String           @id @default(uuid())
-  name        String
-  description String?
-  subject     TeachesSubject[]
+  id           String           @id @default(uuid())
+  abbreviation String
+  name         String
+  description  String?
+  subject      TeachesSubject[]
 }
 
 model TeachesSubject {
