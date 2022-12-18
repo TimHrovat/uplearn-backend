@@ -35,12 +35,33 @@ export class StudentsService {
     return this.prisma.student.findUnique({ where: { id } });
   }
 
-  update(id: string, updateStudentDto: UpdateStudentDto) {
-    return `This action updates a #${id} student`;
+  async update(
+    id: string,
+    { name, surname, dateOfBirth, email, password, classId }: UpdateStudentDto,
+  ) {
+    try {
+      const hashedPassword = await this.hashPassword(password);
+
+      const updatedStudent = await this.prisma.student.update({
+        where: { id },
+        data: {
+          name,
+          surname,
+          dateOfBirth,
+          email,
+          password: hashedPassword,
+          classId,
+        },
+      });
+
+      return updatedStudent;
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   remove(id: string) {
-    return `This action removes a #${id} student`;
+    return this.prisma.student.delete({ where: { id } });
   }
 
   async hashPassword(password: string) {

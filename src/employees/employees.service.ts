@@ -43,12 +43,29 @@ export class EmployeesService {
     return this.prisma.employee.findUnique({ where: { id } });
   }
 
-  update(id: string, updateEmployeeDto: UpdateEmployeeDto) {
-    return `This action updates a #${id} employee`;
+  async update(id: string, updateEmployeeDto: UpdateEmployeeDto) {
+    try {
+      let hashedPassword: string;
+      if (updateEmployeeDto.password) {
+        hashedPassword = await this.hashPassword(updateEmployeeDto.password);
+      }
+
+      const updatedEmployee = await this.prisma.employee.update({
+        where: { id },
+        data: {
+          ...updateEmployeeDto,
+          password: hashedPassword,
+        },
+      });
+
+      return updatedEmployee;
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   remove(id: string) {
-    return `This action removes a #${id} employee`;
+    return this.prisma.employee.delete({ where: { id } });
   }
 
   async hashPassword(password) {
