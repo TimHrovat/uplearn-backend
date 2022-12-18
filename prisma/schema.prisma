@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Student {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(uuid())
   name        String
   surname     String
   dateOfBirth DateTime
@@ -20,12 +20,12 @@ model Student {
   password  String
   createdAt DateTime @default(now())
 
-  class   Class @relation(fields: [classId], references: [id])
-  classId Int   @unique
+  class   Class?  @relation(fields: [classId], references: [id])
+  classId String?
 }
 
 model Employee {
-  id          Int      @id @default(autoincrement())
+  id          String   @id @default(uuid())
   name        String
   surname     String
   dateOfBirth DateTime
@@ -34,7 +34,7 @@ model Employee {
   password  String
   createdAt DateTime @default(now())
 
-  role EmployeeRole
+  role EmployeeRole @default(teacher)
 
   classTeacher           ClassTeacher?
   substituteClassTeacher SubstituteClassTeacher?
@@ -48,7 +48,7 @@ enum EmployeeRole {
 }
 
 model Subject {
-  id          Int              @id @default(autoincrement())
+  id          String           @id @default(uuid())
   name        String
   description String?
   subject     TeachesSubject[]
@@ -56,10 +56,10 @@ model Subject {
 
 model TeachesSubject {
   employee   Employee @relation(fields: [employeeID], references: [id])
-  employeeID Int      @unique
+  employeeID String   @unique
 
   subject   Subject @relation(fields: [subjectID], references: [id])
-  subjectID Int     @unique
+  subjectID String  @unique
 
   Lesson       Lesson[]
   TeachesClass TeachesClass[]
@@ -69,37 +69,37 @@ model TeachesSubject {
 
 model TeachesClass {
   teaches    TeachesSubject @relation(fields: [employeeID, subjectID], references: [employeeID, subjectID])
-  employeeID Int            @unique
-  subjectID  Int            @unique
+  employeeID String         @unique
+  subjectID  String         @unique
 
-  class   Class @relation(fields: [classID], references: [id])
-  classID Int   @unique
+  class   Class  @relation(fields: [classID], references: [id])
+  classID String @unique
 
   @@id([employeeID, subjectID, classID])
 }
 
 model ClassTeacher {
-  class   Class @relation(fields: [classID], references: [id])
-  classID Int   @unique
+  class   Class  @relation(fields: [classID], references: [id])
+  classID String @unique
 
   employee   Employee @relation(fields: [employeeID], references: [id])
-  employeeID Int      @unique
+  employeeID String   @unique
 
   @@id([classID, employeeID])
 }
 
 model SubstituteClassTeacher {
-  class   Class @relation(fields: [classID], references: [id])
-  classID Int   @unique
+  class   Class  @relation(fields: [classID], references: [id])
+  classID String @unique
 
   employee   Employee @relation(fields: [employeeID], references: [id])
-  employeeID Int      @unique
+  employeeID String   @unique
 
   @@id([classID, employeeID])
 }
 
 model Class {
-  id                     Int                     @id @default(autoincrement())
+  id                     String                  @id @default(uuid())
   name                   String
   students               Student[]
   classTeacher           ClassTeacher?
@@ -109,14 +109,14 @@ model Class {
 }
 
 model Classroom {
-  id     Int      @id @default(autoincrement())
+  id     String   @id @default(uuid())
   name   String
   floor  Int
   Lesson Lesson[]
 }
 
 model SchoolHour {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   hour      Int      @unique // prva ura, druga ura...
   startTime DateTime @unique
   Lesson    Lesson[]
@@ -124,17 +124,17 @@ model SchoolHour {
 
 model Lesson {
   schoolHour   SchoolHour @relation(fields: [schoolHourID], references: [id])
-  schoolHourID Int
+  schoolHourID String
 
-  class   Class @relation(fields: [classID], references: [id])
-  classID Int
+  class   Class  @relation(fields: [classID], references: [id])
+  classID String
 
   classRoom   Classroom @relation(fields: [classRoomID], references: [id])
-  classRoomID Int
+  classRoomID String
 
   teaches    TeachesSubject @relation(fields: [employeeID, subjectID], references: [employeeID, subjectID])
-  employeeID Int
-  subjectID  Int
+  employeeID String
+  subjectID  String
 
   date DateTime
 
