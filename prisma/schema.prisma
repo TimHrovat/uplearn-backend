@@ -1,143 +1,30 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
-model Student {
-  id          String   @id @default(uuid())
-  name        String
-  surname     String
-  dateOfBirth DateTime
+model User {
+    id          String   @id @default(uuid())
+    name        String
+    surname     String
+    email       String
+    dateOfBirth DateTime
 
-  email     String
-  password  String
-  createdAt DateTime @default(now())
+    firstPassword String
+    password      String
 
-  class   Class?  @relation(fields: [classID], references: [id])
-  classID String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now()) @updatedAt
+
+    role Role
 }
 
-model Employee {
-  id          String   @id @default(uuid())
-  name        String
-  surname     String
-  dateOfBirth DateTime
-
-  email     String
-  password  String
-  createdAt DateTime @default(now())
-
-  role EmployeeRole @default(teacher)
-
-  classTeacher           ClassTeacher?
-  substituteClassTeacher SubstituteClassTeacher?
-  teaches                TeachesSubject[]
-}
-
-enum EmployeeRole {
-  principal
-  admin
-  teacher
-}
-
-model Subject {
-  id           String           @id @default(uuid())
-  abbreviation String
-  name         String
-  description  String?
-  subject      TeachesSubject[]
-}
-
-model TeachesSubject {
-  employee   Employee @relation(fields: [employeeID], references: [id])
-  employeeID String
-
-  subject   Subject @relation(fields: [subjectID], references: [id])
-  subjectID String
-
-  Lesson       Lesson[]
-  TeachesClass TeachesClass[]
-
-  @@id([employeeID, subjectID])
-}
-
-model TeachesClass {
-  teaches    TeachesSubject @relation(fields: [employeeID, subjectID], references: [employeeID, subjectID])
-  employeeID String         @unique
-  subjectID  String         @unique
-
-  class   Class  @relation(fields: [classID], references: [id])
-  classID String @unique
-
-  @@id([employeeID, subjectID, classID])
-}
-
-model ClassTeacher {
-  class   Class  @relation(fields: [classID], references: [id])
-  classID String @unique
-
-  employee   Employee @relation(fields: [employeeID], references: [id])
-  employeeID String   @unique
-
-  @@id([classID, employeeID])
-}
-
-model SubstituteClassTeacher {
-  class   Class  @relation(fields: [classID], references: [id])
-  classID String @unique
-
-  employee   Employee @relation(fields: [employeeID], references: [id])
-  employeeID String   @unique
-
-  @@id([classID, employeeID])
-}
-
-model Class {
-  id                     String                  @id @default(uuid())
-  name                   String
-  students               Student[]
-  classTeacher           ClassTeacher?
-  substituteClassTeacher SubstituteClassTeacher?
-  Lesson                 Lesson[]
-  TeachesClass           TeachesClass[]
-}
-
-model Classroom {
-  id     String   @id @default(uuid())
-  name   String
-  floor  Int
-  Lesson Lesson[]
-}
-
-model SchoolHour {
-  id        String   @id @default(uuid())
-  hour      Int      @unique // prva ura, druga ura...
-  startTime DateTime @unique
-  Lesson    Lesson[]
-}
-
-model Lesson {
-  schoolHour   SchoolHour @relation(fields: [schoolHourID], references: [id])
-  schoolHourID String
-
-  class   Class  @relation(fields: [classID], references: [id])
-  classID String
-
-  classRoom   Classroom @relation(fields: [classRoomID], references: [id])
-  classRoomID String
-
-  teaches    TeachesSubject @relation(fields: [employeeID, subjectID], references: [employeeID, subjectID])
-  employeeID String
-  subjectID  String
-
-  date DateTime
-
-  @@id([schoolHourID, classID, classRoomID, subjectID, date])
+enum Role {
+    employee
+    student
+    admin
 }
