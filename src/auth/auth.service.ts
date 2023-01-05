@@ -26,7 +26,7 @@ export class AuthService {
         `${loginUserDto.username} tried to login with username that doesn't exist`,
       );
 
-      throw new UnauthorizedException();
+      throw new UnauthorizedException({ cause: loginUserDto.username });
     }
 
     const validPass = await bcrypt.compare(
@@ -39,7 +39,7 @@ export class AuthService {
         `${loginUserDto.username} tried to login with incorrect password`,
       );
 
-      throw new UnauthorizedException();
+      throw new UnauthorizedException({ cause: loginUserDto.password });
     }
 
     if (user.firstPassword) {
