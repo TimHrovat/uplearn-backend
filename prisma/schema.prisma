@@ -11,10 +11,11 @@ model User {
     id          String   @id @default(uuid())
     name        String
     surname     String
+    username    String   @unique
     email       String
     dateOfBirth DateTime
 
-    firstPassword String
+    firstPassword String?
     password      String
 
     createdAt DateTime @default(now())
