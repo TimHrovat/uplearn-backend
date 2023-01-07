@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -28,6 +29,24 @@ export class UsersService {
     }
   }
 
+  async updateById(id: string, updateUserDto: UpdateUserDto) {
+    if (updateUserDto.password != null) {
+      const userDropFristPassword = await this.prisma.user.update({
+        where: { id },
+        data: { firstPassword: null },
+      });
+    }
+
+    const user = await this.prisma.user.update({
+      where: { id },
+      data: updateUserDto,
+    });
+
+    if (!user) throw new BadRequestException();
+
+    return user;
+  }
+
   async findMany() {
     return await this.prisma.user.findMany();
   }
@@ -46,8 +65,6 @@ export class UsersService {
       _count: true,
     });
 
-    this.logger.verbose(userCount);
-
     const username = (
       name +
       '.' +
@@ -58,8 +75,8 @@ export class UsersService {
     return username;
   }
 
-  private async hashPassword(password: string) {
-    return bcrypt.hash(password, await bcrypt.genSalt());
+  async hashPassword(password: string) {
+    return await bcrypt.hash(password, await bcrypt.genSalt());
   }
 
   private handleError(e: Error) {

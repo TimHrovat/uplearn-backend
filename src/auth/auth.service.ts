@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   Logger,
@@ -8,6 +9,9 @@ import { UsersService } from 'src/users/users.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { SetUserPasswordDto } from './dto/set-user-password.dto';
+import { jwtSecret } from 'src/utils/constants';
+import { Request, Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -18,12 +22,12 @@ export class AuthService {
 
   private readonly logger: Logger = new Logger(AuthService.name);
 
-  async validateUser(loginUserDto: LoginUserDto) {
+  async validateUserPassword(loginUserDto: LoginUserDto) {
     const user = await this.usersService.findByUsername(loginUserDto.username);
 
     if (!user) {
       this.logger.verbose(
-        `${loginUserDto.username} tried to login with username that doesn't exist`,
+        `${loginUserDto.username} provided a username that doesn't exist`,
       );
 
       throw new UnauthorizedException({ cause: loginUserDto.username });
@@ -36,11 +40,17 @@ export class AuthService {
 
     if (!validPass) {
       this.logger.verbose(
-        `${loginUserDto.username} tried to login with incorrect password`,
+        `${loginUserDto.username} provided an incorrect password`,
       );
 
       throw new UnauthorizedException({ cause: loginUserDto.password });
     }
+
+    return user;
+  }
+
+  async validateUser(loginUserDto: LoginUserDto) {
+    const user = await this.validateUserPassword(loginUserDto);
 
     if (user.firstPassword) {
       throw new ForbiddenException('Password not yet changed');
@@ -51,9 +61,35 @@ export class AuthService {
     return otherData;
   }
 
-  //TODO: add method for first login
+  async setNewUserPassword(setUserPasswordDto: SetUserPasswordDto) {
+    const { username, password, newPassword } = setUserPasswordDto;
 
-  async login(loginUserDto: LoginUserDto) {
+    const user = await this.validateUserPassword({ username, password });
+
+    const invalidPassword = await bcrypt.compare(newPassword, user.password);
+
+    if (invalidPassword) {
+      this.logger.verbose(
+        `${username} tried to change their password but provided the same password`,
+      );
+
+      throw new BadRequestException('New password is the same as the old one');
+    }
+
+    const newPasswordHashed = await this.usersService.hashPassword(newPassword);
+
+    const updatedUser = await this.usersService.updateById(user.id, {
+      password: newPasswordHashed,
+    });
+
+    if (!updatedUser) {
+      throw new BadRequestException();
+    }
+
+    return updatedUser;
+  }
+
+  async login(loginUserDto: LoginUserDto, req: Request, res: Response) {
     const user = await this.validateUser(loginUserDto);
 
     const payload = {
@@ -61,8 +97,20 @@ export class AuthService {
       role: user.role,
     };
 
-    return {
-      accessToken: this.jwtService.sign(payload),
-    };
+    const token = this.jwtService.sign(payload, { secret: jwtSecret });
+
+    if (!token) {
+      throw new ForbiddenException('No token');
+    }
+
+    res.cookie('token', token);
+
+    return res.send({ message: 'Logged in succesfully' });
+  }
+
+  async logout(req: Request, res: Response) {
+    res.clearCookie('token');
+
+    return res.send({ message: 'Logged out succesfully' });
   }
 }

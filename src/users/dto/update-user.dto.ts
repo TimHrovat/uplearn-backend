@@ -5,8 +5,8 @@ import {
   IsNotEmpty,
   IsDate,
   IsEmail,
-  Length,
   IsEnum,
+  Length,
 } from 'class-validator';
 
 export class UpdateUserDto {
@@ -16,7 +16,7 @@ export class UpdateUserDto {
   })
   @IsNotEmpty()
   @IsString()
-  name: string;
+  name?: string;
 
   @ApiProperty({
     name: 'surname',
@@ -24,7 +24,7 @@ export class UpdateUserDto {
   })
   @IsNotEmpty()
   @IsString()
-  surname: string;
+  surname?: string;
 
   @ApiProperty({
     name: 'email',
@@ -32,7 +32,7 @@ export class UpdateUserDto {
   })
   @IsNotEmpty()
   @IsEmail()
-  email: string;
+  email?: string;
 
   @ApiProperty({
     name: 'dateOfBirth',
@@ -40,15 +40,15 @@ export class UpdateUserDto {
   })
   @IsNotEmpty()
   @IsDate()
-  dateOfBirth: string;
+  dateOfBirth?: string;
 
   @ApiProperty({
     name: 'password',
-    example: 'a63Ggvie73pd22j-Gdo',
+    example: 'john.cena',
   })
-  @IsNotEmpty()
   @Length(8, 128)
-  password: string;
+  @IsString()
+  password?: string;
 
   @ApiProperty({
     name: 'role',
@@ -56,5 +56,5 @@ export class UpdateUserDto {
   })
   @IsNotEmpty()
   @IsEnum(Role)
-  role: Role;
+  role?: Role;
 }
