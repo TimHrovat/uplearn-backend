@@ -1,9 +1,16 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
-import { Prisma } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Request } from 'express';
 
 @Injectable()
 export class UsersService {
@@ -22,6 +29,9 @@ export class UsersService {
       const newUser = await this.prisma.user.create({
         data: { ...createUserDto, password: password, username: username },
       });
+
+      delete newUser.password;
+      delete newUser.firstPassword;
 
       return newUser;
     } catch (e) {
@@ -44,15 +54,49 @@ export class UsersService {
 
     if (!user) throw new BadRequestException();
 
+    delete user.password;
+    delete user.firstPassword;
+
+    return user;
+  }
+
+  async findUnique(id: string, req: Request) {
+    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!user) throw new BadRequestException();
+
+    const reqUser = req.user as { id: string; role: Role };
+
+    if (id !== reqUser.id) throw new ForbiddenException();
+
+    delete user.firstPassword;
+    delete user.password;
+
     return user;
   }
 
   async findMany() {
-    return await this.prisma.user.findMany();
+    return await this.prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        surname: true,
+        email: true,
+        username: true,
+        dateOfBirth: true,
+        role: true,
+      },
+    });
   }
 
   async findByUsername(username: string) {
-    return await this.prisma.user.findUnique({ where: { username: username } });
+    const user = await this.prisma.user.findUnique({
+      where: { username: username },
+    });
+
+    if (!user) throw new NotFoundException();
+
+    return user;
   }
 
   async delete(id: string) {

@@ -8,7 +8,8 @@ datasource db {
 }
 
 model User {
-    id          String   @id @default(uuid())
+    id String @id @default(uuid())
+
     name        String
     surname     String
     username    String   @unique
@@ -22,10 +23,224 @@ model User {
     updatedAt DateTime @default(now()) @updatedAt
 
     role Role
+
+    Employee Employee?
+    Student  Student?
 }
 
 enum Role {
     employee
     student
     admin
+}
+
+model Employee {
+    id String @default(uuid())
+
+    user   User   @relation(fields: [userId], references: [id])
+    userId String @unique
+
+    Employee_Subject       Employee_Subject[]
+    ClassTeacher           ClassTeacher?
+    SubstituteClassTeacher SubstituteClassTeacher?
+
+    @@id([id, userId])
+}
+
+model Subject {
+    abbreviation String  @id
+    name         String
+    description  String?
+
+    Employee_Subject    Employee_Subject[]
+    Subject_SubjectList Subject_SubjectList[]
+}
+
+model Employee_Subject {
+    employee       Employee @relation(fields: [employeeId, employeeUserId], references: [id, userId])
+    employeeId     String
+    employeeUserId String
+
+    subject                Subject                  @relation(fields: [subjectAbbreviation], references: [abbreviation])
+    subjectAbbreviation    String
+    Employee_Subject_Class Employee_Subject_Class[]
+    Lesson                 Lesson[]
+
+    @@id([employeeId, subjectAbbreviation])
+}
+
+model SubjectList {
+    id   String @id @default(uuid())
+    name String
+
+    Subject_ClassSubjectList Subject_SubjectList[]
+    Class                    Class[]
+}
+
+model Subject_SubjectList {
+    subject             Subject @relation(fields: [subjectAbbreviation], references: [abbreviation])
+    subjectAbbreviation String
+
+    classSubjectList   SubjectList @relation(fields: [classSubjectListId], references: [id])
+    classSubjectListId String
+
+    lessonsPerWeek Int
+
+    @@id([subjectAbbreviation, classSubjectListId])
+}
+
+model Class {
+    name String @id
+    year Int
+
+    subjectList   SubjectList? @relation(fields: [subjectListId], references: [id])
+    subjectListId String?
+
+    Employee_Subject_Class Employee_Subject_Class[]
+    Student                Student[]
+    ClassTeacher           ClassTeacher?
+    SubstituteClassTeacher SubstituteClassTeacher?
+    Lesson                 Lesson[]
+}
+
+model Employee_Subject_Class {
+    employee_Subject    Employee_Subject @relation(fields: [employeeId, subjectAbbreviation], references: [employeeId, subjectAbbreviation])
+    employeeId          String
+    subjectAbbreviation String
+
+    class     Class  @relation(fields: [className], references: [name])
+    className String
+
+    @@id([employeeId, subjectAbbreviation, className])
+}
+
+model ClassTeacher {
+    class     Class  @relation(fields: [className], references: [name])
+    className String @unique
+
+    employee       Employee @relation(fields: [employeeId, employeeUserId], references: [id, userId])
+    employeeId     String
+    employeeUserId String
+
+    @@id([className, employeeId, employeeUserId])
+    @@unique([employeeId, employeeUserId])
+}
+
+model SubstituteClassTeacher {
+    class     Class  @relation(fields: [className], references: [name])
+    className String @unique
+
+    employee       Employee @relation(fields: [employeeId, employeeUserId], references: [id, userId])
+    employeeId     String
+    employeeUserId String
+
+    @@id([className, employeeId, employeeUserId])
+    @@unique([employeeId, employeeUserId])
+}
+
+model Student {
+    id String @default(uuid())
+
+    user   User   @relation(fields: [userId], references: [id])
+    userId String @unique
+
+    class     Class?  @relation(fields: [className], references: [name])
+    className String?
+
+    Grade   Grade[]
+    Absence Absence[]
+
+    @@id([id, userId])
+}
+
+model SchoolYear {
+    startDate DateTime
+    endDate   DateTime
+    Grade     Grade[]
+
+    @@id([startDate, endDate])
+}
+
+model Grade {
+    id String @id @default(uuid())
+
+    value       Int
+    type        GradeType
+    description String?
+
+    student       Student @relation(fields: [studentId, studentUserId], references: [id, userId])
+    studentId     String
+    studentUserId String
+
+    schoolYear          SchoolYear @relation(fields: [schoolYearStartDate, schoolYearEndDate], references: [startDate, endDate])
+    schoolYearStartDate DateTime
+    schoolYearEndDate   DateTime
+}
+
+enum GradeType {
+    ORAL
+    WRITTEN
+    OTHER
+}
+
+model SchoolHour {
+    num       Int      @id
+    startTime DateTime @unique
+    endTime   DateTime @unique
+    Lesson    Lesson[]
+}
+
+model Classroom {
+    name   String        @id
+    type   ClassroomType @default(NORMAL)
+    Lesson Lesson[]
+}
+
+enum ClassroomType {
+    NORMAL
+    LAB
+    GYM
+    COMPUTER
+}
+
+model Lesson {
+    id String @id @default(uuid())
+
+    description String?
+    date        DateTime
+    type        LessonType @default(NORMAL)
+
+    employee_Subject    Employee_Subject @relation(fields: [employeeId, subjectAbbreviation], references: [employeeId, subjectAbbreviation])
+    employeeId          String
+    subjectAbbreviation String
+
+    class     Class  @relation(fields: [className], references: [name])
+    className String
+
+    classroom     Classroom @relation(fields: [classroomName], references: [name])
+    classroomName String
+
+    schoolHour    SchoolHour @relation(fields: [schoolHourNum], references: [num])
+    schoolHourNum Int
+
+    Absence Absence[]
+}
+
+enum LessonType {
+    NORMAL
+    SUBSTITUTE
+    GRADING
+}
+
+model Absence {
+    id String @id @default(uuid())
+
+    description String?
+
+    lesson   Lesson @relation(fields: [lessonId], references: [id])
+    lessonId String
+
+    student       Student @relation(fields: [studentId, studentUserId], references: [id, userId])
+    studentId     String
+    studentUserId String
 }
