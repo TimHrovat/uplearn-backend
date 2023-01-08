@@ -41,7 +41,7 @@ export class UsersService {
 
   async updateById(id: string, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password != null) {
-      const userDropFristPassword = await this.prisma.user.update({
+      await this.prisma.user.update({
         where: { id },
         data: { firstPassword: null },
       });
@@ -60,14 +60,10 @@ export class UsersService {
     return user;
   }
 
-  async findUnique(id: string, req: Request) {
+  async findUnique(id: string) {
     const user = await this.prisma.user.findUnique({ where: { id } });
 
     if (!user) throw new BadRequestException();
-
-    const reqUser = req.user as { id: string; role: Role };
-
-    if (id !== reqUser.id) throw new ForbiddenException();
 
     delete user.firstPassword;
     delete user.password;
@@ -121,6 +117,12 @@ export class UsersService {
 
   async hashPassword(password: string) {
     return await bcrypt.hash(password, await bcrypt.genSalt());
+  }
+
+  private validateRequest(id: string, req: Request) {
+    const reqUser = req.user as { id: string; role: Role };
+
+    if (id !== reqUser.id) throw new ForbiddenException();
   }
 
   private handleError(e: Error) {

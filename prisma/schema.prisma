@@ -35,7 +35,7 @@ enum Role {
 }
 
 model Employee {
-    id String @default(uuid())
+    id String @unique @default(uuid())
 
     user   User   @relation(fields: [userId], references: [id])
     userId String @unique
@@ -139,7 +139,7 @@ model SubstituteClassTeacher {
 }
 
 model Student {
-    id String @default(uuid())
+    id String @unique @default(uuid())
 
     user   User   @relation(fields: [userId], references: [id])
     userId String @unique
