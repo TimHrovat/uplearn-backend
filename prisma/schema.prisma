@@ -57,12 +57,12 @@ model Subject {
 }
 
 model Employee_Subject {
-    employee       Employee @relation(fields: [employeeId, employeeUserId], references: [id, userId])
-    employeeId     String
-    employeeUserId String
+    employee   Employee @relation(fields: [employeeId], references: [id])
+    employeeId String
 
-    subject                Subject                  @relation(fields: [subjectAbbreviation], references: [abbreviation])
-    subjectAbbreviation    String
+    subject             Subject @relation(fields: [subjectAbbreviation], references: [abbreviation])
+    subjectAbbreviation String
+
     Employee_Subject_Class Employee_Subject_Class[]
     Lesson                 Lesson[]
 
@@ -118,24 +118,20 @@ model ClassTeacher {
     class     Class  @relation(fields: [className], references: [name])
     className String @unique
 
-    employee       Employee @relation(fields: [employeeId, employeeUserId], references: [id, userId])
-    employeeId     String
-    employeeUserId String
+    employee   Employee @relation(fields: [employeeId], references: [id])
+    employeeId String   @unique
 
-    @@id([className, employeeId, employeeUserId])
-    @@unique([employeeId, employeeUserId])
+    @@id([className, employeeId])
 }
 
 model SubstituteClassTeacher {
     class     Class  @relation(fields: [className], references: [name])
     className String @unique
 
-    employee       Employee @relation(fields: [employeeId, employeeUserId], references: [id, userId])
-    employeeId     String
-    employeeUserId String
+    employee   Employee @relation(fields: [employeeId], references: [id])
+    employeeId String   @unique
 
-    @@id([className, employeeId, employeeUserId])
-    @@unique([employeeId, employeeUserId])
+    @@id([className, employeeId])
 }
 
 model Student {
@@ -154,11 +150,11 @@ model Student {
 }
 
 model SchoolYear {
+    id        String    @id @default(uuid())
     startDate DateTime
     endDate   DateTime
     Grade     Grade[]
-
-    @@id([startDate, endDate])
+    Absence   Absence[]
 }
 
 model Grade {
@@ -168,13 +164,11 @@ model Grade {
     type        GradeType
     description String?
 
-    student       Student @relation(fields: [studentId, studentUserId], references: [id, userId])
-    studentId     String
-    studentUserId String
+    student   Student @relation(fields: [studentId], references: [id])
+    studentId String
 
-    schoolYear          SchoolYear @relation(fields: [schoolYearStartDate, schoolYearEndDate], references: [startDate, endDate])
-    schoolYearStartDate DateTime
-    schoolYearEndDate   DateTime
+    schoolYear   SchoolYear @relation(fields: [schoolYearId], references: [id])
+    schoolYearId String
 }
 
 enum GradeType {
@@ -240,7 +234,9 @@ model Absence {
     lesson   Lesson @relation(fields: [lessonId], references: [id])
     lessonId String
 
-    student       Student @relation(fields: [studentId, studentUserId], references: [id, userId])
-    studentId     String
-    studentUserId String
+    student   Student @relation(fields: [studentId], references: [id])
+    studentId String
+
+    schoolYear   SchoolYear @relation(fields: [schoolYearId], references: [id])
+    schoolYearId String
 }

@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ConnectToSubjectDto } from './dto/connect-to-subject.dto';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 
 @Injectable()
@@ -28,6 +29,27 @@ export class EmployeesService {
 
   async findUnique(id: string) {
     const employee = await this.prisma.employee.findUnique({ where: { id } });
+
+    if (!employee) throw new BadRequestException();
+
+    return employee;
+  }
+
+  async connectToSubject(id: string, connectToSubjectDto: ConnectToSubjectDto) {
+    const employee = await this.prisma.employee.update({
+      where: { id },
+      data: {
+        Employee_Subject: {
+          create: {
+            subject: {
+              connect: {
+                abbreviation: connectToSubjectDto.subjectAbbreviation,
+              },
+            },
+          },
+        },
+      },
+    });
 
     if (!employee) throw new BadRequestException();
 

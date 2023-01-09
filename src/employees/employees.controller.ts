@@ -4,11 +4,13 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { ConnectToSubjectDto } from './dto/connect-to-subject.dto';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 import { EmployeesService } from './employees.service';
 
@@ -31,6 +33,14 @@ export class EmployeesController {
   @Get(':id')
   async findUnique(@Param('id') id: string) {
     return this.employeesService.findUnique(id);
+  }
+
+  @Patch('connect_to_subject/:id')
+  async connectToSubject(
+    @Param('id') id: string,
+    @Body() connectToSubjectDto: ConnectToSubjectDto,
+  ) {
+    return this.employeesService.connectToSubject(id, connectToSubjectDto);
   }
 
   @Delete(':id')
