@@ -11,6 +11,7 @@ import * as bcrypt from 'bcrypt';
 import { Prisma, Role } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Request } from 'express';
+import { generate } from 'generate-password';
 
 @Injectable()
 export class UsersService {
@@ -19,7 +20,13 @@ export class UsersService {
   private readonly logger: Logger = new Logger(UsersService.name);
 
   async create(createUserDto: CreateUserDto) {
-    const password = await this.hashPassword(createUserDto.firstPassword);
+    const firstPassword = generate({
+      length: 16,
+      numbers: true,
+      symbols: true,
+    });
+
+    const password = await this.hashPassword(firstPassword);
     const username = await this.newUsername(
       createUserDto.name,
       createUserDto.surname,
@@ -27,11 +34,13 @@ export class UsersService {
 
     try {
       const newUser = await this.prisma.user.create({
-        data: { ...createUserDto, password: password, username: username },
+        data: {
+          ...createUserDto,
+          password: password,
+          username: username,
+          firstPassword,
+        },
       });
-
-      delete newUser.password;
-      delete newUser.firstPassword;
 
       return newUser;
     } catch (e) {
@@ -40,13 +49,6 @@ export class UsersService {
   }
 
   async updateById(id: string, updateUserDto: UpdateUserDto) {
-    if (updateUserDto.password != null) {
-      await this.prisma.user.update({
-        where: { id },
-        data: { firstPassword: null },
-      });
-    }
-
     const user = await this.prisma.user.update({
       where: { id },
       data: updateUserDto,

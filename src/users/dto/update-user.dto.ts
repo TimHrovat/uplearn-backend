@@ -44,11 +44,23 @@ export class UpdateUserDto {
 
   @ApiProperty({
     name: 'password',
-    example: 'john.cena',
+    example: 'asf2y23/ab77.21',
   })
   @Length(8, 128)
   @IsString()
   password?: string;
+
+  @ApiProperty({
+    name: 'firstPassword',
+    example: 'asf2y23/ab77.21',
+  })
+  firstPassword?: string;
+
+  @ApiProperty({
+    name: 'firstPasswordReplaced',
+    example: 'true',
+  })
+  firstPasswordReplaced?: boolean;
 
   @ApiProperty({
     name: 'role',

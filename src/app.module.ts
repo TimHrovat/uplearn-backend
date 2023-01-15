@@ -7,9 +7,11 @@ import { AuthModule } from './auth/auth.module';
 import { StudentsModule } from './students/students.module';
 import { EmployeesModule } from './employees/employees.module';
 import { SubjectsModule } from './subjects/subjects.module';
+import { EmployeesSubjectsModule } from './employees_subjects/employees_subjects.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, StudentsModule, EmployeesModule, SubjectsModule],
+  imports: [PrismaModule, UsersModule, AuthModule, StudentsModule, EmployeesModule, SubjectsModule, EmployeesSubjectsModule, EmailModule],
   controllers: [AppController],
   providers: [AppService],
 })

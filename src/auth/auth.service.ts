@@ -9,15 +9,18 @@ import { UsersService } from 'src/users/users.service';
 import { LoginUserDto } from './dto/login-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { SetUserPasswordDto } from './dto/set-user-password.dto';
 import { jwtSecret } from 'src/utils/constants';
 import { Request, Response } from 'express';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { EmailService } from 'src/email/email.service';
+import { ReplaceFirstPasswordDto } from './dto/replace-first-password.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly emailService: EmailService,
   ) {}
 
   private readonly logger: Logger = new Logger(AuthService.name);
@@ -52,48 +55,57 @@ export class AuthService {
   async validateUser(loginUserDto: LoginUserDto) {
     const user = await this.validateUserPassword(loginUserDto);
 
-    if (user.firstPassword) {
-      throw new ForbiddenException('Password not yet changed');
-    }
-
     const { firstPassword, password, ...otherData } = user;
 
     return otherData;
   }
 
-  async setNewUserPassword(setUserPasswordDto: SetUserPasswordDto) {
-    const { username, password, newPassword } = setUserPasswordDto;
+  async registerUser(createUserDto: CreateUserDto) {
+    const user = await this.usersService.create(createUserDto);
 
-    const user = await this.validateUserPassword({ username, password });
+    this.logger.verbose('user created');
 
-    const invalidPassword = await bcrypt.compare(newPassword, user.password);
-
-    if (invalidPassword) {
-      this.logger.verbose(
-        `${username} tried to change their password but provided the same password`,
-      );
-
-      throw new BadRequestException('New password is the same as the old one');
-    }
-
-    const newPasswordHashed = await this.usersService.hashPassword(newPassword);
-
-    const updatedUser = await this.usersService.updateById(user.id, {
-      password: newPasswordHashed,
-    });
-
-    if (!updatedUser) {
+    if (!user) {
       throw new BadRequestException();
     }
 
-    return updatedUser;
+    await this.emailService.sendCredentials(user.email, {
+      name: user.name,
+      username: user.username,
+      password: user.firstPassword,
+    });
+
+    return user;
   }
 
-  async login(loginUserDto: LoginUserDto, req: Request, res: Response) {
-    const user = await this.validateUser(loginUserDto);
+  async replaceFirstPassword(
+    replaceFirstPasswordDto: ReplaceFirstPasswordDto,
+    req: Request,
+    res: Response,
+  ) {
+    let reqToken = null;
+
+    if (req.cookies && 'token' in req.cookies) {
+      reqToken = req.cookies.token;
+    } else {
+      return;
+    }
+
+    const decoded = this.jwtService.decode(reqToken);
+
+    const hashedPassword = await this.usersService.hashPassword(
+      replaceFirstPasswordDto.password,
+    );
+
+    const user = await this.usersService.updateById(decoded['id'], {
+      firstPassword: null,
+      firstPasswordReplaced: true,
+      password: hashedPassword,
+    });
 
     const payload = {
       id: user.id,
+      firstPasswordReplaced: user.firstPasswordReplaced,
       role: user.role,
     };
 
@@ -103,7 +115,27 @@ export class AuthService {
       throw new ForbiddenException('No token');
     }
 
-    res.cookie('token', token);
+    res.cookie('token', token, { sameSite: 'none', secure: true });
+
+    return res.send({ message: 'First password replaced successfully' });
+  }
+
+  async login(loginUserDto: LoginUserDto, req: Request, res: Response) {
+    const user = await this.validateUser(loginUserDto);
+
+    const payload = {
+      id: user.id,
+      firstPasswordReplaced: user.firstPasswordReplaced,
+      role: user.role,
+    };
+
+    const token = this.jwtService.sign(payload, { secret: jwtSecret });
+
+    if (!token) {
+      throw new ForbiddenException('No token');
+    }
+
+    res.cookie('token', token, { sameSite: 'none', secure: true });
 
     return res.send({ message: 'Logged in succesfully' });
   }
