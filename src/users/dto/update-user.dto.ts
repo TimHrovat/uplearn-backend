@@ -43,6 +43,14 @@ export class UpdateUserDto {
   dateOfBirth?: string;
 
   @ApiProperty({
+    name: 'currentPassword',
+    example: 'asf2y23/ab77.21',
+  })
+  @IsString()
+  @Length(8, 128)
+  currentPassword?: string;
+
+  @ApiProperty({
     name: 'password',
     example: 'asf2y23/ab77.21',
   })
@@ -61,6 +69,13 @@ export class UpdateUserDto {
     example: 'true',
   })
   firstPasswordReplaced?: boolean;
+
+  @ApiProperty({
+    name: 'gsm',
+    example: '+38640505248',
+  })
+  @IsString()
+  gsm?: string;
 
   @ApiProperty({
     name: 'role',

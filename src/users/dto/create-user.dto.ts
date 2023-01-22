@@ -28,6 +28,13 @@ export class CreateUserDto {
   email: string;
 
   @ApiProperty({
+    name: 'gsm',
+    example: '+38640505248',
+  })
+  @IsString()
+  gsm?: string;
+
+  @ApiProperty({
     name: 'dateOfBirth',
     example: '2017-07-21T17:32:28Z',
   })

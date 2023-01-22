@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
@@ -35,9 +36,14 @@ export class UsersController {
     return await this.usersService.findUnique(id);
   }
 
-  @Patch(':id')
+  @Patch('update/:id')
   async updateById(@Param('id') id: string, updateUserDto: UpdateUserDto) {
     return await this.usersService.updateById(id, updateUserDto);
+  }
+
+  @Patch('update-authenticated')
+  async updateAuthenticated(@Body() updateUserDto: UpdateUserDto, @Req() req) {
+    return await this.usersService.updateAuthenticated(updateUserDto, req);
   }
 
   @Delete(':id')

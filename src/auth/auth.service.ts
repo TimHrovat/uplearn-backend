@@ -93,14 +93,10 @@ export class AuthService {
 
     const decoded = this.jwtService.decode(reqToken);
 
-    const hashedPassword = await this.usersService.hashPassword(
-      replaceFirstPasswordDto.password,
-    );
-
     const user = await this.usersService.updateById(decoded['id'], {
       firstPassword: null,
       firstPasswordReplaced: true,
-      password: hashedPassword,
+      password: replaceFirstPasswordDto.password,
     });
 
     const payload = {

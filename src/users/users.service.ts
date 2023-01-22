@@ -4,6 +4,7 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -12,10 +13,14 @@ import { Prisma, Role } from '@prisma/client';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Request } from 'express';
 import { generate } from 'generate-password';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   private readonly logger: Logger = new Logger(UsersService.name);
 
@@ -49,6 +54,9 @@ export class UsersService {
   }
 
   async updateById(id: string, updateUserDto: UpdateUserDto) {
+    if (updateUserDto.password)
+      updateUserDto.password = await this.hashPassword(updateUserDto.password);
+
     const user = await this.prisma.user.update({
       where: { id },
       data: updateUserDto,
@@ -60,6 +68,56 @@ export class UsersService {
     delete user.firstPassword;
 
     return user;
+  }
+
+  async updateAuthenticated(updateUserDto: UpdateUserDto, req: Request) {
+    let reqToken = null;
+
+    if (req.cookies && 'token' in req.cookies) {
+      reqToken = req.cookies.token;
+    } else {
+      return;
+    }
+
+    const decoded = this.jwtService.decode(reqToken);
+
+    if (updateUserDto.password && !updateUserDto.currentPassword) {
+      throw new BadRequestException({
+        cause:
+          'To change your password, you must first provide your current password',
+      });
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: decoded['id'] },
+    });
+
+    if (updateUserDto.password) {
+      const validPass = await bcrypt.compare(
+        updateUserDto.currentPassword,
+        user.password,
+      );
+
+      if (!validPass)
+        throw new UnauthorizedException({
+          cause: "Current password doesn't match the stored password",
+        });
+
+      updateUserDto.password = await this.hashPassword(updateUserDto.password);
+    }
+
+    delete updateUserDto.currentPassword;
+
+    try {
+      const updatedUser = await this.prisma.user.update({
+        where: { id: decoded['id'] },
+        data: updateUserDto,
+      });
+
+      return updatedUser;
+    } catch (e) {
+      throw new BadRequestException({ cause: 'This username already exists.' });
+    }
   }
 
   async findUnique(id: string) {
