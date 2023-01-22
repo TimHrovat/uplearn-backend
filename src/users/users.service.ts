@@ -37,6 +37,8 @@ export class UsersService {
       createUserDto.surname,
     );
 
+    createUserDto.dateOfBirth = createUserDto.dateOfBirth + 'T00:00:00.000Z';
+
     try {
       const newUser = await this.prisma.user.create({
         data: {
@@ -56,6 +58,9 @@ export class UsersService {
   async updateById(id: string, updateUserDto: UpdateUserDto) {
     if (updateUserDto.password)
       updateUserDto.password = await this.hashPassword(updateUserDto.password);
+
+    if (updateUserDto.dateOfBirth)
+      updateUserDto.dateOfBirth = updateUserDto.dateOfBirth + 'T00:00:00.000Z';
 
     const user = await this.prisma.user.update({
       where: { id },
@@ -107,6 +112,9 @@ export class UsersService {
     }
 
     delete updateUserDto.currentPassword;
+
+    if (updateUserDto.dateOfBirth)
+      updateUserDto.dateOfBirth = updateUserDto.dateOfBirth + 'T00:00:00.000Z';
 
     try {
       const updatedUser = await this.prisma.user.update({
