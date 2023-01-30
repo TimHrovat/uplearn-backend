@@ -23,7 +23,11 @@ export class EmployeesService {
   }
 
   async findAll() {
-    return await this.prisma.employee.findMany();
+    return await this.prisma.employee.findMany({
+      include: {
+        user: true,
+      },
+    });
   }
 
   async findUnique(id: string) {

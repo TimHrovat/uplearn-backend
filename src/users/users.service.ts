@@ -14,12 +14,16 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Request } from 'express';
 import { generate } from 'generate-password';
 import { JwtService } from '@nestjs/jwt';
+import { StudentsService } from 'src/students/students.service';
+import { EmployeesService } from 'src/employees/employees.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly studentsService: StudentsService,
+    private readonly employeesService: EmployeesService,
   ) {}
 
   private readonly logger: Logger = new Logger(UsersService.name);
@@ -37,7 +41,7 @@ export class UsersService {
       createUserDto.surname,
     );
 
-    createUserDto.dateOfBirth = createUserDto.dateOfBirth + 'T00:00:00.000Z';
+    createUserDto.dateOfBirth = createUserDto.dateOfBirth;
 
     try {
       const newUser = await this.prisma.user.create({
@@ -48,6 +52,14 @@ export class UsersService {
           firstPassword,
         },
       });
+
+      if (createUserDto.role === 'student') {
+        await this.studentsService.create({ userId: newUser.id });
+      }
+
+      if (createUserDto.role === 'employee') {
+        await this.employeesService.create({ userId: newUser.id });
+      }
 
       return newUser;
     } catch (e) {

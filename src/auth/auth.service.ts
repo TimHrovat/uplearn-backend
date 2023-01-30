@@ -63,10 +63,8 @@ export class AuthService {
   async registerUser(createUserDto: CreateUserDto) {
     const user = await this.usersService.create(createUserDto);
 
-    this.logger.verbose('user created');
-
     if (!user) {
-      throw new BadRequestException();
+      throw new BadRequestException({ cause: 'User couldnt be created' });
     }
 
     await this.emailService.sendCredentials(user.email, {
@@ -74,6 +72,8 @@ export class AuthService {
       username: user.username,
       password: user.firstPassword,
     });
+
+    this.logger.verbose('user created');
 
     return user;
   }
