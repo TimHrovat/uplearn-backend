@@ -24,7 +24,7 @@ export class SubjectListsService {
       })
       .catch(() => {
         throw new BadRequestException({
-          cause: 'Something went wrong, please try again later1',
+          cause: 'Something went wrong, please try again later',
         });
       });
 

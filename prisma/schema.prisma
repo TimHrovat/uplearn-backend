@@ -43,8 +43,8 @@ model Employee {
     userId String @unique
 
     Employee_Subject       Employee_Subject[]
-    ClassTeacher           ClassTeacher?
-    SubstituteClassTeacher SubstituteClassTeacher?
+    ClassTeacher           Class?             @relation("class-teacher")
+    SubstituteClassTeacher Class?             @relation("substitute-class-teacher")
 
     @@id([id, userId])
 }
@@ -76,7 +76,7 @@ model SubjectList {
     name String
 
     Subject_SubjectList Subject_SubjectList[]
-    Class                    Class[]
+    Class               Class[]
 }
 
 model Subject_SubjectList {
@@ -98,9 +98,14 @@ model Class {
 
     Employee_Subject_Class Employee_Subject_Class[]
     Student                Student[]
-    ClassTeacher           ClassTeacher?
-    SubstituteClassTeacher SubstituteClassTeacher?
-    Lesson                 Lesson[]
+
+    classTeacher   Employee? @relation(name: "class-teacher", fields: [classTeacherId], references: [id], onDelete: Cascade)
+    classTeacherId String?   @unique
+
+    substituteClassTeacher   Employee? @relation(name: "substitute-class-teacher", fields: [substituteClassTeacherId], references: [id], onDelete: Cascade)
+    substituteClassTeacherId String?   @unique
+
+    Lesson Lesson[]
 }
 
 model Employee_Subject_Class {
@@ -112,26 +117,6 @@ model Employee_Subject_Class {
     className String
 
     @@id([employeeId, subjectAbbreviation, className])
-}
-
-model ClassTeacher {
-    class     Class  @relation(fields: [className], references: [name], onDelete: Cascade)
-    className String @unique
-
-    employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-    employeeId String   @unique
-
-    @@id([className, employeeId])
-}
-
-model SubstituteClassTeacher {
-    class     Class  @relation(fields: [className], references: [name], onDelete: Cascade)
-    className String @unique
-
-    employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-    employeeId String   @unique
-
-    @@id([className, employeeId])
 }
 
 model Student {

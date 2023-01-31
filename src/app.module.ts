@@ -9,6 +9,7 @@ import { EmployeesModule } from './employees/employees.module';
 import { SubjectsModule } from './subjects/subjects.module';
 import { EmailModule } from './email/email.module';
 import { SubjectListsModule } from './subject-lists/subject-lists.module';
+import { ClassesModule } from './classes/classes.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { SubjectListsModule } from './subject-lists/subject-lists.module';
     SubjectsModule,
     EmailModule,
     SubjectListsModule,
+    ClassesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
