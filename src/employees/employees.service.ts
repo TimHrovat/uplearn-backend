@@ -30,6 +30,28 @@ export class EmployeesService {
     });
   }
 
+  async findAllNonClassTeachers() {
+    return await this.prisma.employee.findMany({
+      where: {
+        ClassTeacher: null,
+      },
+      include: {
+        user: true,
+      },
+    });
+  }
+
+  async findAllNonSubstituteClassTeachers() {
+    return await this.prisma.employee.findMany({
+      where: {
+        SubstituteClassTeacher: null,
+      },
+      include: {
+        user: true,
+      },
+    });
+  }
+
   async findUnique(id: string) {
     const employee = await this.prisma.employee.findUnique({ where: { id } });
 

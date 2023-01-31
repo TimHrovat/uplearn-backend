@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateSubjectManyDto } from './dto/create-subject-many.dto';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
 
@@ -21,7 +22,43 @@ export class SubjectsService {
     return subject;
   }
 
-  async findAll() {
+  async createFromArrayOfObjects(createSubjectManyDto: CreateSubjectManyDto) {
+    const { teachers, ...other } = createSubjectManyDto;
+
+    const subject = await this.prisma.subject
+      .create({
+        data: other,
+      })
+      .catch(() => {
+        throw new BadRequestException({ cause: 'This subject already exists' });
+      });
+
+    const formattedTeachers: {
+      employeeId: string;
+      subjectAbbreviation: string;
+    }[] = [];
+
+    teachers.forEach((teacher) => {
+      formattedTeachers.push({
+        employeeId: teacher.value,
+        subjectAbbreviation: other.abbreviation,
+      });
+    });
+
+    if (!subject) throw new BadRequestException();
+
+    if (teachers.length === 0) return subject;
+
+    const employeeSubject = await this.prisma.employee_Subject.createMany({
+      data: formattedTeachers,
+    });
+
+    if (!employeeSubject) throw new BadRequestException();
+
+    return subject;
+  }
+
+  async w() {
     return await this.prisma.subject.findMany();
   }
 

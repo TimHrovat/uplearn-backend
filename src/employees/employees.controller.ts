@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -26,16 +25,26 @@ export class EmployeesController {
 
   @Get()
   async findAll() {
-    return this.employeesService.findAll();
+    return await this.employeesService.findAll();
+  }
+
+  @Get('non-class-teachers')
+  async findAllNonClassTeachers() {
+    return await this.employeesService.findAllNonClassTeachers();
+  }
+
+  @Get('non-substitute-class-teachers')
+  async findAllNonSubstituteClassTeachers() {
+    return await this.employeesService.findAllNonSubstituteClassTeachers();
   }
 
   @Get(':id')
   async findUnique(@Param('id') id: string) {
-    return this.employeesService.findUnique(id);
+    return await this.employeesService.findUnique(id);
   }
 
   @Delete(':id')
   async delete(@Param('id') id: string) {
-    return this.employeesService.delete(id);
+    return await this.employeesService.delete(id);
   }
 }

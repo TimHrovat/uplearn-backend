@@ -24,7 +24,14 @@ export class StudentsService {
   }
 
   async findAll() {
-    return await this.prisma.student.findMany();
+    return await this.prisma.student.findMany({ include: { user: true } });
+  }
+
+  async findAllWithoutClass() {
+    return await this.prisma.student.findMany({
+      where: { class: null },
+      include: { user: true },
+    });
   }
 
   async findUnique(id: string) {

@@ -75,7 +75,7 @@ model SubjectList {
     id   String @id @default(uuid())
     name String
 
-    Subject_ClassSubjectList Subject_SubjectList[]
+    Subject_SubjectList Subject_SubjectList[]
     Class                    Class[]
 }
 
@@ -83,12 +83,10 @@ model Subject_SubjectList {
     subject             Subject @relation(fields: [subjectAbbreviation], references: [abbreviation], onDelete: Cascade)
     subjectAbbreviation String
 
-    classSubjectList   SubjectList @relation(fields: [classSubjectListId], references: [id], onDelete: Cascade)
-    classSubjectListId String
+    subjectList   SubjectList @relation(fields: [subjectListId], references: [id], onDelete: Cascade)
+    subjectListId String
 
-    lessonsPerWeek Int
-
-    @@id([subjectAbbreviation, classSubjectListId])
+    @@id([subjectAbbreviation, subjectListId])
 }
 
 model Class {

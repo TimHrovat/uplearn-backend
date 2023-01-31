@@ -22,17 +22,22 @@ export class StudentsController {
 
   @Post('create')
   async create(@Body() createStudentDto: CreateStudentDto) {
-    return this.studentsService.create(createStudentDto);
+    return await this.studentsService.create(createStudentDto);
   }
 
   @Get()
   async findAll() {
-    return this.studentsService.findAll();
+    return await this.studentsService.findAll();
+  }
+
+  @Get('without-class')
+  async findAllWithoutClass() {
+    return await this.studentsService.findAllWithoutClass();
   }
 
   @Get(':id')
   async findUnique(@Param('id') id: string) {
-    return this.studentsService.findUnique(id);
+    return await this.studentsService.findUnique(id);
   }
 
   @Patch(':id')
@@ -40,11 +45,11 @@ export class StudentsController {
     @Param('id') id: string,
     @Body() updateStudentDto: UpdateStudentDto,
   ) {
-    return this.studentsService.update(id, updateStudentDto);
+    return await this.studentsService.update(id, updateStudentDto);
   }
 
   @Delete(':id')
   async delete(@Param('id') id: string) {
-    return this.studentsService.delete(id);
+    return await this.studentsService.delete(id);
   }
 }

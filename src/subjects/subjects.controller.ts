@@ -8,6 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateSubjectManyDto } from './dto/create-subject-many.dto';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
 import { SubjectsService } from './subjects.service';
@@ -20,6 +21,13 @@ export class SubjectsController {
   @Post('create')
   async create(@Body() createSubjectDto: CreateSubjectDto) {
     return await this.subjectsService.create(createSubjectDto);
+  }
+
+  @Post('create-many')
+  async createMany(@Body() createSubjectManyDto: CreateSubjectManyDto) {
+    return await this.subjectsService.createFromArrayOfObjects(
+      createSubjectManyDto,
+    );
   }
 
   @Get()
