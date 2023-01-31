@@ -58,7 +58,7 @@ export class SubjectsService {
     return subject;
   }
 
-  async w() {
+  async findAll() {
     return await this.prisma.subject.findMany();
   }
 
