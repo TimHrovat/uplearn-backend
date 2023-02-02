@@ -55,6 +55,15 @@ export class StudentsService {
     return student;
   }
 
+  async removeFromClass(id: string) {
+    const student = await this.prisma.student.update({
+      where: { id },
+      data: {
+        className: null,
+      },
+    });
+  }
+
   async delete(id: string) {
     const student = await this.prisma.student.delete({
       where: { id },

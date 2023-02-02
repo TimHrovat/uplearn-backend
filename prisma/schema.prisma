@@ -125,7 +125,7 @@ model Student {
     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId String @unique
 
-    class     Class?  @relation(fields: [className], references: [name], onDelete: Cascade)
+    class     Class?  @relation(fields: [className], references: [name], onDelete: SetNull)
     className String?
 
     Grade   Grade[]

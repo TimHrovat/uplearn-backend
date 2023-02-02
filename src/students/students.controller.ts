@@ -48,6 +48,11 @@ export class StudentsController {
     return await this.studentsService.update(id, updateStudentDto);
   }
 
+  @Patch('remove-from-class/:id')
+  async removeFromClass(@Param('id') id: string) {
+    return await this.studentsService.removeFromClass(id);
+  }
+
   @Delete(':id')
   async delete(@Param('id') id: string) {
     return await this.studentsService.delete(id);

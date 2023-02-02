@@ -67,11 +67,19 @@ export class AuthService {
       throw new BadRequestException({ cause: 'User couldnt be created' });
     }
 
-    await this.emailService.sendCredentials(user.email, {
-      name: user.name,
-      username: user.username,
-      password: user.firstPassword,
-    });
+    await this.emailService
+      .sendCredentials(user.email, {
+        name: user.name,
+        username: user.username,
+        password: user.firstPassword,
+      })
+      .catch(async () => {
+        await this.usersService.delete(user.id);
+
+        throw new BadRequestException({
+          cause: "Couldn't send message to provided email",
+        });
+      });
 
     this.logger.verbose('user created');
 
