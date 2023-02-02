@@ -1,0 +1,25 @@
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { ClassroomsService } from './classrooms.service';
+import { CreateClassroomDto } from './dto/create-classroom.dto';
+
+@Controller('classrooms')
+@ApiTags('Classrooms')
+export class ClassroomsController {
+  constructor(private readonly classroomsService: ClassroomsService) {}
+
+  @Post('create')
+  async create(@Body() createClassroomDto: CreateClassroomDto) {
+    return await this.classroomsService.create(createClassroomDto);
+  }
+
+  @Get()
+  async findMany() {
+    return await this.classroomsService.findMany();
+  }
+
+  @Delete(':name')
+  async delete(@Param('name') name: string) {
+    return await this.classroomsService.delete(name);
+  }
+}
