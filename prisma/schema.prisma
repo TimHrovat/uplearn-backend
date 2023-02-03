@@ -136,8 +136,8 @@ model Student {
 
 model SchoolYear {
     id        String    @id @default(uuid())
-    startDate DateTime
-    endDate   DateTime
+    startDate DateTime  @db.Date
+    endDate   DateTime  @db.Date
     Grade     Grade[]
     Absence   Absence[]
 }
@@ -163,9 +163,9 @@ enum GradeType {
 }
 
 model SchoolHour {
-    num       Int      @id
-    startTime DateTime @unique
-    endTime   DateTime @unique
+    id        String   @id @default(uuid())
+    startTime DateTime @unique @db.Time
+    endTime   DateTime @unique @db.Time
     Lesson    Lesson[]
 }
 
@@ -186,7 +186,7 @@ model Lesson {
     id String @id @default(uuid())
 
     description String?
-    date        DateTime
+    date        DateTime   @db.Date
     type        LessonType @default(NORMAL)
 
     employee_Subject    Employee_Subject @relation(fields: [employeeId, subjectAbbreviation], references: [employeeId, subjectAbbreviation], onDelete: Cascade)
@@ -199,8 +199,8 @@ model Lesson {
     classroom     Classroom @relation(fields: [classroomName], references: [name], onDelete: Cascade)
     classroomName String
 
-    schoolHour    SchoolHour @relation(fields: [schoolHourNum], references: [num], onDelete: Cascade)
-    schoolHourNum Int
+    schoolHour   SchoolHour @relation(fields: [schoolHourId], references: [id], onDelete: Cascade)
+    schoolHourId String
 
     Absence Absence[]
 }

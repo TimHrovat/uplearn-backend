@@ -11,6 +11,7 @@ import { EmailModule } from './email/email.module';
 import { SubjectListsModule } from './subject-lists/subject-lists.module';
 import { ClassesModule } from './classes/classes.module';
 import { ClassroomsModule } from './classrooms/classrooms.module';
+import { SchoolHoursModule } from './school-hours/school-hours.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { ClassroomsModule } from './classrooms/classrooms.module';
     SubjectListsModule,
     ClassesModule,
     ClassroomsModule,
+    SchoolHoursModule,
   ],
   controllers: [AppController],
   providers: [AppService],

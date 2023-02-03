@@ -41,8 +41,6 @@ export class UsersService {
       createUserDto.surname,
     );
 
-    createUserDto.dateOfBirth = createUserDto.dateOfBirth;
-
     try {
       const newUser = await this.prisma.user.create({
         data: {
