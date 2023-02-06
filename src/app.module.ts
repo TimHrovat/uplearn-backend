@@ -12,6 +12,7 @@ import { SubjectListsModule } from './subject-lists/subject-lists.module';
 import { ClassesModule } from './classes/classes.module';
 import { ClassroomsModule } from './classrooms/classrooms.module';
 import { SchoolHoursModule } from './school-hours/school-hours.module';
+import { LessonsModule } from './lessons/lessons.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { SchoolHoursModule } from './school-hours/school-hours.module';
     ClassesModule,
     ClassroomsModule,
     SchoolHoursModule,
+    LessonsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

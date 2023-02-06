@@ -1,6 +1,15 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateSchoolHourDto } from './dto/create-school-hour.dto';
+import { UpdateSchoolHourDto } from './dto/update-school-hour.dto';
 import { SchoolHoursService } from './school-hours.service';
 
 @Controller('school-hours')
@@ -16,5 +25,18 @@ export class SchoolHoursController {
   @Get()
   async findMany() {
     return await this.schoolHoursService.findMany();
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return await this.schoolHoursService.delete(id);
+  }
+
+  @Patch(':id')
+  async update(
+    @Param('id') id: string,
+    @Body() updateSchoolHourDto: UpdateSchoolHourDto,
+  ) {
+    return await this.schoolHoursService.update(id, updateSchoolHourDto);
   }
 }

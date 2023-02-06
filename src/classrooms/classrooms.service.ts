@@ -14,6 +14,19 @@ export class ClassroomsService {
     return await this.prisma.classroom.findMany();
   }
 
+  async findManyWhereNotInLesson(date: string, schoolHourId: string) {
+    return await this.prisma.classroom.findMany({
+      where: {
+        Lesson: {
+          none: {
+            date: date,
+            schoolHourId: schoolHourId,
+          },
+        },
+      },
+    });
+  }
+
   async delete(name: string) {
     return await this.prisma.classroom.delete({ where: { name } });
   }

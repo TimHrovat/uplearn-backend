@@ -18,6 +18,17 @@ export class ClassroomsController {
     return await this.classroomsService.findMany();
   }
 
+  @Get('where-not-in-lesson/:date/:schoolHourId')
+  async findManyWhereNotInLesson(
+    @Param('date') date: string,
+    @Param('schoolHourId') schoolHourId: string,
+  ) {
+    return await this.classroomsService.findManyWhereNotInLesson(
+      date,
+      schoolHourId,
+    );
+  }
+
   @Delete(':name')
   async delete(@Param('name') name: string) {
     return await this.classroomsService.delete(name);
