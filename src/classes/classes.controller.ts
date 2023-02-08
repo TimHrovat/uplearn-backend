@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { ClassesService } from './classes.service';
+import { ConnectToEmployeeSubjectDto } from './dto/connect-to-employee-subject.dto';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
 
@@ -30,6 +31,17 @@ export class ClassesController {
   @Get(':name')
   async findUnique(@Param('name') name: string) {
     return await this.classesService.findUnique(name);
+  }
+
+  @Post('connect-to-employee-subject/:name')
+  async connectToEmployeeSubject(
+    @Param('name') name: string,
+    @Body() connectToEmployeeSubjectDto: ConnectToEmployeeSubjectDto,
+  ) {
+    return await this.classesService.connectToEmployeeSubject(
+      name,
+      connectToEmployeeSubjectDto,
+    );
   }
 
   @Patch(':name')

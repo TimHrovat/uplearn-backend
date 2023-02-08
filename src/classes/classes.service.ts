@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { ConnectToEmployeeSubjectDto } from './dto/connect-to-employee-subject.dto';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
 
@@ -107,6 +108,57 @@ export class ClassesService {
     });
   }
 
+  async connectToEmployeeSubject(
+    name: string,
+    connectToEmployeeSubjectDto: ConnectToEmployeeSubjectDto,
+  ) {
+    console.log(connectToEmployeeSubjectDto);
+
+    const exists = await this.prisma.employee_Subject_Class.findUnique({
+      where: {
+        subjectAbbreviation_className: {
+          className: name,
+          subjectAbbreviation: connectToEmployeeSubjectDto.subjectAbbreviation,
+        },
+      },
+    });
+
+    await this.prisma.lesson.updateMany({
+      where: {
+        className: name,
+        subjectAbbreviation: connectToEmployeeSubjectDto.subjectAbbreviation,
+        date: {
+          gte: new Date(),
+        },
+      },
+      data: {
+        employeeId: connectToEmployeeSubjectDto.employeeId,
+      },
+    });
+
+    if (exists === null) {
+      return await this.prisma.employee_Subject_Class.create({
+        data: {
+          className: name,
+          subjectAbbreviation: connectToEmployeeSubjectDto.subjectAbbreviation,
+          employeeId: connectToEmployeeSubjectDto.employeeId,
+        },
+      });
+    }
+
+    return await this.prisma.employee_Subject_Class.update({
+      where: {
+        subjectAbbreviation_className: {
+          subjectAbbreviation: connectToEmployeeSubjectDto.subjectAbbreviation,
+          className: name,
+        },
+      },
+      data: {
+        employeeId: connectToEmployeeSubjectDto.employeeId,
+      },
+    });
+  }
+
   async findUnique(name: string) {
     return await this.prisma.class.findUnique({
       where: { name },
@@ -130,7 +182,32 @@ export class ClassesService {
           include: {
             Subject_SubjectList: {
               include: {
-                subject: true,
+                subject: {
+                  include: {
+                    Employee_Subject: {
+                      include: {
+                        employee: {
+                          include: {
+                            user: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        Employee_Subject_Class: {
+          include: {
+            employee_Subject: {
+              include: {
+                employee: {
+                  include: {
+                    user: true,
+                  },
+                },
               },
             },
           },

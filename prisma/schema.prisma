@@ -45,6 +45,7 @@ model Employee {
     Employee_Subject       Employee_Subject[]
     ClassTeacher           Class?             @relation("class-teacher")
     SubstituteClassTeacher Class?             @relation("substitute-class-teacher")
+    SubstituteLesson       Lesson[]
 
     @@id([id, userId])
 }
@@ -116,7 +117,7 @@ model Employee_Subject_Class {
     class     Class  @relation(fields: [className], references: [name], onDelete: Cascade)
     className String
 
-    @@id([employeeId, subjectAbbreviation, className])
+    @@id([subjectAbbreviation, className])
 }
 
 model Student {
@@ -189,9 +190,12 @@ model Lesson {
     date        DateTime   @db.Date
     type        LessonType @default(NORMAL)
 
-    employee_Subject    Employee_Subject @relation(fields: [employeeId, subjectAbbreviation], references: [employeeId, subjectAbbreviation], onDelete: Cascade)
-    employeeId          String
-    subjectAbbreviation String
+    employee_Subject    Employee_Subject? @relation(fields: [employeeId, subjectAbbreviation], references: [employeeId, subjectAbbreviation], onDelete: Cascade)
+    employeeId          String?
+    subjectAbbreviation String?
+
+    substituteEmployee   Employee? @relation(fields: [substituteEmployeeId], references: [id], onDelete: Cascade)
+    substituteEmployeeId String?
 
     class     Class  @relation(fields: [className], references: [name], onDelete: Cascade)
     className String

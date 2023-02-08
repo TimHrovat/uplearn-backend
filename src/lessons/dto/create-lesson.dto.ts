@@ -32,12 +32,12 @@ export class CreateLessonDto {
   })
   @IsNotEmpty()
   @IsString()
-  employeeId: string;
+  employeeId?: string;
 
   @ApiProperty({ name: 'subjectAbbreviation', example: 'MAT' })
   @IsNotEmpty()
   @IsString()
-  subjectAbbreviation: string;
+  subjectAbbreviation?: string;
 
   @ApiProperty({ name: 'className', example: 'R4C' })
   @IsNotEmpty()
@@ -48,6 +48,14 @@ export class CreateLessonDto {
   @IsNotEmpty()
   @IsString()
   classroomName: string;
+
+  @ApiProperty({
+    name: 'substituteEmployeeId',
+    example: '0f83668c-9f55-45c0-a285-382fac75835f',
+  })
+  @IsNotEmpty()
+  @IsString()
+  substituteEmployeeId?: string;
 
   @ApiProperty({
     name: 'schoolHourId',

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 
@@ -7,6 +7,57 @@ export class LessonsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createLessonDto: CreateLessonDto) {
+    const checkTeachers = await this.prisma.employee.findMany({
+      where: {
+        AND: [
+          {
+            id:
+              createLessonDto.employeeId ??
+              createLessonDto.substituteEmployeeId,
+          },
+          {
+            OR: [
+              {
+                Employee_Subject: {
+                  some: {
+                    Employee_Subject_Class: {
+                      some: {
+                        class: {
+                          Lesson: {
+                            some: {
+                              date: { equals: createLessonDto.date },
+                              schoolHourId: {
+                                equals: createLessonDto.schoolHourId,
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              {
+                SubstituteLesson: {
+                  some: {
+                    date: { equals: createLessonDto.date },
+                    schoolHourId: {
+                      equals: createLessonDto.schoolHourId,
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    if (checkTeachers.length !== 0)
+      throw new BadRequestException(
+        'This teacher already has a class at this time',
+      );
+
     return await this.prisma.lesson.create({ data: createLessonDto });
   }
 
@@ -31,6 +82,11 @@ export class LessonsService {
                 user: true,
               },
             },
+          },
+        },
+        substituteEmployee: {
+          include: {
+            user: true,
           },
         },
       },
