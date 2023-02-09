@@ -96,4 +96,27 @@ export class LessonsService {
   async findMany() {
     return await this.prisma.lesson.findMany();
   }
+
+  async findUnique(id: string) {
+    return await this.prisma.lesson.findUnique({
+      where: { id },
+      include: {
+        employee_Subject: {
+          include: {
+            employee: {
+              include: {
+                user: true,
+              },
+            },
+            subject: true,
+          },
+        },
+        substituteEmployee: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+  }
 }

@@ -112,8 +112,6 @@ export class ClassesService {
     name: string,
     connectToEmployeeSubjectDto: ConnectToEmployeeSubjectDto,
   ) {
-    console.log(connectToEmployeeSubjectDto);
-
     const exists = await this.prisma.employee_Subject_Class.findUnique({
       where: {
         subjectAbbreviation_className: {

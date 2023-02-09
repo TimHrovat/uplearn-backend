@@ -30,4 +30,9 @@ export class LessonsController {
   async findMany() {
     return await this.lessonsService.findMany();
   }
+
+  @Get(':id')
+  async findUnique(@Param('id') id: string) {
+    return await this.lessonsService.findUnique(id);
+  }
 }
