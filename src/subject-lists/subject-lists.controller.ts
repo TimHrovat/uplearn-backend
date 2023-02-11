@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateSubjectListDto } from './dto/create-subject-list.dto';
 import { SubjectListsService } from './subject-lists.service';
@@ -16,5 +16,10 @@ export class SubjectListsController {
   @Get()
   async findAll() {
     return await this.subjectListsService.findAll();
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return await this.subjectListsService.delete(id);
   }
 }

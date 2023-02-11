@@ -26,27 +26,24 @@ export class AuthService {
   private readonly logger: Logger = new Logger(AuthService.name);
 
   async validateUserPassword(loginUserDto: LoginUserDto) {
-    const user = await this.usersService.findByUsername(loginUserDto.username);
+    const user = await this.usersService
+      .findByUsername(loginUserDto.username)
+      .catch(() => {
+        throw new UnauthorizedException('Wrong username or password');
+      });
 
-    if (!user) {
-      this.logger.verbose(
-        `${loginUserDto.username} provided a username that doesn't exist`,
-      );
-
-      throw new UnauthorizedException({ cause: loginUserDto.username });
-    }
-
-    const validPass = await bcrypt.compare(
-      loginUserDto.password,
-      user.password,
-    );
+    const validPass = await bcrypt
+      .compare(loginUserDto.password, user.password)
+      .catch(() => {
+        throw new UnauthorizedException('Wrong username or password');
+      });
 
     if (!validPass) {
       this.logger.verbose(
         `${loginUserDto.username} provided an incorrect password`,
       );
 
-      throw new UnauthorizedException({ cause: loginUserDto.password });
+      throw new UnauthorizedException('Wrong username or password');
     }
 
     return user;
@@ -64,7 +61,7 @@ export class AuthService {
     const user = await this.usersService.create(createUserDto);
 
     if (!user) {
-      throw new BadRequestException({ cause: 'User couldnt be created' });
+      throw new BadRequestException('User couldnt be created');
     }
 
     await this.emailService
@@ -76,9 +73,9 @@ export class AuthService {
       .catch(async () => {
         await this.usersService.delete(user.id);
 
-        throw new BadRequestException({
-          cause: "Couldn't send message to provided email",
-        });
+        throw new BadRequestException(
+          "Couldn't send message to provided email",
+        );
       });
 
     this.logger.verbose('user created');

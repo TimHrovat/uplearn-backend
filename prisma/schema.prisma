@@ -94,16 +94,16 @@ model Class {
     name String @id
     year Int
 
-    subjectList   SubjectList? @relation(fields: [subjectListId], references: [id], onDelete: Cascade)
+    subjectList   SubjectList? @relation(fields: [subjectListId], references: [id], onDelete: Restrict)
     subjectListId String?
 
     Employee_Subject_Class Employee_Subject_Class[]
     Student                Student[]
 
-    classTeacher   Employee? @relation(name: "class-teacher", fields: [classTeacherId], references: [id], onDelete: Cascade)
+    classTeacher   Employee? @relation(name: "class-teacher", fields: [classTeacherId], references: [id], onDelete: Restrict)
     classTeacherId String?   @unique
 
-    substituteClassTeacher   Employee? @relation(name: "substitute-class-teacher", fields: [substituteClassTeacherId], references: [id], onDelete: Cascade)
+    substituteClassTeacher   Employee? @relation(name: "substitute-class-teacher", fields: [substituteClassTeacherId], references: [id], onDelete: Restrict)
     substituteClassTeacherId String?   @unique
 
     Lesson Lesson[]
@@ -189,6 +189,7 @@ model Lesson {
     description String?
     date        DateTime   @db.Date
     type        LessonType @default(NORMAL)
+    lessonGroup String?
 
     employee_Subject    Employee_Subject? @relation(fields: [employeeId, subjectAbbreviation], references: [employeeId, subjectAbbreviation], onDelete: Cascade)
     employeeId          String?

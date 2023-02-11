@@ -62,6 +62,8 @@ export class StudentsService {
         className: null,
       },
     });
+
+    return student;
   }
 
   async delete(id: string) {

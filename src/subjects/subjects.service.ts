@@ -65,6 +65,17 @@ export class SubjectsService {
   async findUnique(abbreviation: string) {
     const subject = await this.prisma.subject.findUnique({
       where: { abbreviation },
+      include: {
+        Employee_Subject: {
+          include: {
+            employee: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!subject) throw new BadRequestException();

@@ -1,6 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
+import { v4 as uuid } from 'uuid';
+import { CreateManyLessonsDto } from './dto/create-many-lessons.dto';
+import * as moment from 'moment';
 
 @Injectable()
 export class LessonsService {
@@ -61,6 +64,75 @@ export class LessonsService {
     return await this.prisma.lesson.create({ data: createLessonDto });
   }
 
+  async createLessonsForWholeSchoolYear(
+    createManyLessonsDto: CreateManyLessonsDto,
+  ) {
+    const checkTeachers = await this.prisma.employee.findMany({
+      where: {
+        AND: [
+          {
+            id:
+              createManyLessonsDto.employeeId ??
+              createManyLessonsDto.substituteEmployeeId,
+          },
+          {
+            OR: [
+              {
+                Employee_Subject: {
+                  some: {
+                    Employee_Subject_Class: {
+                      some: {
+                        class: {
+                          Lesson: {
+                            some: {
+                              date: { equals: createManyLessonsDto.date },
+                              schoolHourId: {
+                                equals: createManyLessonsDto.schoolHourId,
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              {
+                SubstituteLesson: {
+                  some: {
+                    date: { equals: createManyLessonsDto.date },
+                    schoolHourId: {
+                      equals: createManyLessonsDto.schoolHourId,
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    });
+
+    if (checkTeachers.length !== 0)
+      throw new BadRequestException(
+        'This teacher already has a class at this time',
+      );
+
+    createManyLessonsDto.lessonGroup = uuid();
+
+    const lessons: CreateLessonDto[] = [];
+    let date = new Date(createManyLessonsDto.date);
+    const endDate = getEndDate(createManyLessonsDto.date);
+
+    while (date < endDate) {
+      lessons.push({ ...createManyLessonsDto });
+      date = moment(date).add(1, 'week').toDate();
+      createManyLessonsDto.date = date.toISOString();
+    }
+
+    return await this.prisma.lesson.createMany({ data: lessons });
+  }
+
   async getLessonsByClassAndDateRange(
     className: string,
     startDate: string,
@@ -119,4 +191,36 @@ export class LessonsService {
       },
     });
   }
+
+  async delete(id: string) {
+    return await this.prisma.lesson.delete({ where: { id } });
+  }
+
+  async deleteMany(lessonGroupId: string) {
+    const today = new Date();
+
+    return await this.prisma.lesson.deleteMany({
+      where: {
+        lessonGroup: lessonGroupId,
+        date: { gte: today.toISOString() },
+      },
+    });
+  }
+}
+
+function getEndDate(startDate: string) {
+  let endDate: Date = new Date(startDate);
+
+  if (endDate.getMonth() > 5) {
+    endDate = moment(endDate).add(1, 'year').toDate();
+  }
+
+  if (endDate.getMonth() === 5 && endDate.getDate() > 24) {
+    endDate = moment(endDate).add(1, 'year').toDate();
+  }
+
+  endDate.setDate(24);
+  endDate.setMonth(5);
+
+  return endDate;
 }

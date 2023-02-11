@@ -97,10 +97,9 @@ export class UsersService {
     const decoded = this.jwtService.decode(reqToken);
 
     if (updateUserDto.password && !updateUserDto.currentPassword) {
-      throw new BadRequestException({
-        cause:
-          'To change your password, you must first provide your current password',
-      });
+      throw new BadRequestException(
+        'To change your password, you must first provide your current password',
+      );
     }
 
     const user = await this.prisma.user.findUnique({
@@ -114,9 +113,9 @@ export class UsersService {
       );
 
       if (!validPass)
-        throw new UnauthorizedException({
-          cause: "Current password doesn't match the stored password",
-        });
+        throw new UnauthorizedException(
+          "Current password doesn't match the stored password",
+        );
 
       updateUserDto.password = await this.hashPassword(updateUserDto.password);
     }
@@ -134,12 +133,21 @@ export class UsersService {
 
       return updatedUser;
     } catch (e) {
-      throw new BadRequestException({ cause: 'This username already exists.' });
+      throw new BadRequestException('This username already exists.');
     }
   }
 
   async findUnique(id: string) {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        Student: {
+          include: {
+            class: true,
+          },
+        },
+      },
+    });
 
     if (!user) throw new BadRequestException();
 
@@ -149,8 +157,11 @@ export class UsersService {
     return user;
   }
 
-  async findMany() {
+  async findMany(adminId: string) {
     return await this.prisma.user.findMany({
+      where: {
+        id: { not: adminId },
+      },
       select: {
         id: true,
         name: true,
@@ -159,6 +170,7 @@ export class UsersService {
         username: true,
         dateOfBirth: true,
         role: true,
+        gsm: true,
       },
     });
   }
@@ -174,6 +186,32 @@ export class UsersService {
   }
 
   async delete(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: {
+        Employee: {
+          include: {
+            ClassTeacher: true,
+            SubstituteClassTeacher: true,
+          },
+        },
+      },
+    });
+
+    if (user.Employee) {
+      if (user.Employee.ClassTeacher !== null) {
+        throw new BadRequestException(
+          'Before deleting an employee you must first replace him as a class teacher',
+        );
+      }
+
+      if (user.Employee.SubstituteClassTeacher !== null) {
+        throw new BadRequestException(
+          'Before deleting an employee you must first replace him as a substitute class teacher',
+        );
+      }
+    }
+
     return await this.prisma.user.delete({ where: { id } });
   }
 

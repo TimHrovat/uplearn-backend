@@ -37,6 +37,33 @@ export class SubjectListsService {
   }
 
   async findAll() {
-    return await this.prisma.subjectList.findMany();
+    return await this.prisma.subjectList.findMany({
+      include: {
+        Subject_SubjectList: true,
+      },
+    });
+  }
+
+  async delete(id: string) {
+    const subjectListHasClasses = await this.prisma.subjectList.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        Class: true,
+      },
+    });
+
+    if (subjectListHasClasses.Class.length !== 0) {
+      throw new BadRequestException(
+        'Before deleting a subject list you must first remove it from all classes that use it',
+      );
+    }
+
+    return await this.prisma.subjectList.delete({
+      where: {
+        id,
+      },
+    });
   }
 }

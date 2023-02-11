@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { AddToSubjectDto } from './dto/add-to-subject.dto';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
 
 @Injectable()
@@ -58,6 +59,49 @@ export class EmployeesService {
     if (!employee) throw new BadRequestException();
 
     return employee;
+  }
+
+  async findAllNotInSubject(abbr: string) {
+    return await this.prisma.employee.findMany({
+      where: {
+        Employee_Subject: {
+          none: {
+            subjectAbbreviation: abbr,
+          },
+        },
+      },
+      include: {
+        user: true,
+      },
+    });
+  }
+
+  async removeFromSubject(id: string, abbr: string) {
+    return await this.prisma.employee_Subject.delete({
+      where: {
+        employeeId_subjectAbbreviation: {
+          employeeId: id,
+          subjectAbbreviation: abbr,
+        },
+      },
+    });
+  }
+
+  async addToSubject(addToSubjectDto: AddToSubjectDto) {
+    const data: { employeeId: string; subjectAbbreviation: string }[] = [];
+
+    addToSubjectDto.employees.forEach((employee) => {
+      data.push({
+        employeeId: employee.value,
+        subjectAbbreviation: addToSubjectDto.subjectAbbreviation,
+      });
+    });
+
+    if (data.length === 0) return;
+
+    return await this.prisma.employee_Subject.createMany({
+      data: data,
+    });
   }
 
   async delete(id: string) {

@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateLessonDto } from './dto/create-lesson.dto';
+import { CreateManyLessonsDto } from './dto/create-many-lessons.dto';
 import { LessonsService } from './lessons.service';
 
 @Controller('lessons')
@@ -11,6 +12,13 @@ export class LessonsController {
   @Post('create')
   async create(@Body() createLessonDto: CreateLessonDto) {
     return await this.lessonsService.create(createLessonDto);
+  }
+
+  @Post('create-many')
+  async createMany(@Body() createManyLessonsDto: CreateManyLessonsDto) {
+    return await this.lessonsService.createLessonsForWholeSchoolYear(
+      createManyLessonsDto,
+    );
   }
 
   @Get('lessons-by-class-and-date-range/:name/:start/:end')
@@ -34,5 +42,15 @@ export class LessonsController {
   @Get(':id')
   async findUnique(@Param('id') id: string) {
     return await this.lessonsService.findUnique(id);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    return await this.lessonsService.delete(id);
+  }
+
+  @Delete('delete-many/:lessonGroupId')
+  async deleteMany(@Param('lessonGroupId') lessonGroupId: string) {
+    return await this.lessonsService.deleteMany(lessonGroupId);
   }
 }

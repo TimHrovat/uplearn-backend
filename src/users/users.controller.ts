@@ -26,9 +26,9 @@ export class UsersController {
     return await this.usersService.create(createUserDto);
   }
 
-  @Get()
-  async findAll() {
-    return await this.usersService.findMany();
+  @Get('get-all/:adminId')
+  async findAll(@Param('adminId') adminId: string) {
+    return await this.usersService.findMany(adminId);
   }
 
   @Get(':id')
@@ -37,7 +37,10 @@ export class UsersController {
   }
 
   @Patch('update/:id')
-  async updateById(@Param('id') id: string, updateUserDto: UpdateUserDto) {
+  async updateById(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
     return await this.usersService.updateById(id, updateUserDto);
   }
 
