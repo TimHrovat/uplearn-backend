@@ -14,6 +14,7 @@ import { Request, Response } from 'express';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { EmailService } from 'src/email/email.service';
 import { ReplaceFirstPasswordDto } from './dto/replace-first-password.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
@@ -21,6 +22,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
+    private readonly prisma: PrismaService,
   ) {}
 
   private readonly logger: Logger = new Logger(AuthService.name);
@@ -79,6 +81,44 @@ export class AuthService {
       });
 
     this.logger.verbose('user created');
+
+    return user;
+  }
+
+  async sendForgotPasswordEmail(userId: string) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+
+    if (!user) {
+      throw new BadRequestException('User with this username does not exist');
+    }
+
+
+  }
+
+  async resendCredentials(id: string) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (user.firstPasswordReplaced)
+      throw new BadRequestException('User has already replaced his password');
+
+    await this.emailService
+      .sendCredentials(user.email, {
+        name: user.name,
+        username: user.username,
+        password: user.firstPassword,
+      })
+      .catch(async () => {
+        throw new BadRequestException(
+          "Couldn't send message to provided email",
+        );
+      });
+
+    delete user.firstPassword;
+    delete user.password;
 
     return user;
   }

@@ -6,14 +6,17 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { CreateSchoolHourDto } from './dto/create-school-hour.dto';
 import { UpdateSchoolHourDto } from './dto/update-school-hour.dto';
 import { SchoolHoursService } from './school-hours.service';
 
 @Controller('school-hours')
 @ApiTags('School Hours')
+@UseGuards(JwtAuthGuard)
 export class SchoolHoursController {
   constructor(private readonly schoolHoursService: SchoolHoursService) {}
 

@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Patch, Post, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthService } from './auth.service';
@@ -18,6 +27,11 @@ export class AuthController {
   @Get('logout')
   async logout(@Req() req, @Res() res) {
     return await this.authService.logout(req, res);
+  }
+
+  @Get('resend-credentials/:id')
+  async resendCredentials(@Param('id') id: string) {
+    return await this.authService.resendCredentials(id);
   }
 
   @Post('register')

@@ -1,10 +1,20 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { CreateSubjectListDto } from './dto/create-subject-list.dto';
 import { SubjectListsService } from './subject-lists.service';
 
 @Controller('subject-lists')
 @ApiTags('Subject Lists')
+@UseGuards(JwtAuthGuard)
 export class SubjectListsController {
   constructor(private readonly subjectListsService: SubjectListsService) {}
 

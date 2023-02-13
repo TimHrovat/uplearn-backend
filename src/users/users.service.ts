@@ -162,6 +162,7 @@ export class UsersService {
       where: {
         id: { not: adminId },
       },
+      orderBy: [{ name: 'asc' }, { surname: 'asc' }],
       select: {
         id: true,
         name: true,

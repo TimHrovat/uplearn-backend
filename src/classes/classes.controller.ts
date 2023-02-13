@@ -6,8 +6,10 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { ClassesService } from './classes.service';
 import { ConnectToEmployeeSubjectDto } from './dto/connect-to-employee-subject.dto';
 import { CreateClassDto } from './dto/create-class.dto';
@@ -15,6 +17,7 @@ import { UpdateClassDto } from './dto/update-class.dto';
 
 @Controller('classes')
 @ApiTags('Classes')
+@UseGuards(JwtAuthGuard)
 export class ClassesController {
   constructor(private readonly classesService: ClassesService) {}
 

@@ -1,11 +1,21 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { CreateManyLessonsDto } from './dto/create-many-lessons.dto';
 import { LessonsService } from './lessons.service';
 
 @Controller('lessons')
 @ApiTags('Lessons')
+@UseGuards(JwtAuthGuard)
 export class LessonsController {
   constructor(private readonly lessonsService: LessonsService) {}
 

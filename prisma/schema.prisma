@@ -21,6 +21,8 @@ model User {
     firstPassword         String?
     password              String
 
+    resetPasswordToken String?
+
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now()) @updatedAt
 

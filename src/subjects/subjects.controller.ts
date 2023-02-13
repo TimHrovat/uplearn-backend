@@ -6,8 +6,10 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt.guard';
 import { CreateSubjectManyDto } from './dto/create-subject-many.dto';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
@@ -15,6 +17,7 @@ import { SubjectsService } from './subjects.service';
 
 @Controller('subjects')
 @ApiTags('Subjects')
+@UseGuards(JwtAuthGuard)
 export class SubjectsController {
   constructor(private readonly subjectsService: SubjectsService) {}
 
