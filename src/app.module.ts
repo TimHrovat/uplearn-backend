@@ -30,6 +30,5 @@ import { LessonsModule } from './lessons/lessons.module';
     LessonsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

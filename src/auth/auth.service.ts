@@ -91,8 +91,6 @@ export class AuthService {
     if (!user) {
       throw new BadRequestException('User with this username does not exist');
     }
-
-
   }
 
   async resendCredentials(id: string) {
