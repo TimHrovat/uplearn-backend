@@ -44,6 +44,19 @@ export class LessonsController {
     );
   }
 
+  @Get('lessons-by-employee-and-date-range/:employeeId/:start/:end')
+  async getLessonsByEmployeeAndDateRange(
+    @Param('employeeId') employeeId: string,
+    @Param('start') startDate: string,
+    @Param('end') endDate: string,
+  ) {
+    return await this.lessonsService.getLessonsByEmployeeAndDateRange(
+      employeeId,
+      startDate,
+      endDate,
+    );
+  }
+
   @Get()
   async findMany() {
     return await this.lessonsService.findMany();

@@ -1,11 +1,15 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { SchoolYearsService } from 'src/school-years/school-years.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 
 @Injectable()
 export class StudentsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly schoolYearsService: SchoolYearsService,
+  ) {}
 
   private readonly logger: Logger = new Logger(StudentsService.name);
 
@@ -31,6 +35,29 @@ export class StudentsService {
     return await this.prisma.student.findMany({
       where: { class: null },
       include: { user: true },
+    });
+  }
+
+  async getByClassAndSubject(className: string, subject: string) {
+    const schoolYear = await this.schoolYearsService.getActive();
+
+    if (!schoolYear) throw new BadRequestException('No valid school year');
+
+    return await this.prisma.student.findMany({
+      where: {
+        className,
+      },
+      include: {
+        Grade: {
+          where: {
+            AND: [
+              { subjectAbbreviation: subject },
+              { schoolYearId: schoolYear.id },
+            ],
+          },
+        },
+        user: true,
+      },
     });
   }
 

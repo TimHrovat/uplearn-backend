@@ -35,6 +35,14 @@ export class StudentsController {
     return await this.studentsService.findAllWithoutClass();
   }
 
+  @Get('class-subject/:className/:subject')
+  async getByClassAndSubject(
+    @Param('className') className: string,
+    @Param('subject') subject: string,
+  ) {
+    return await this.studentsService.getByClassAndSubject(className, subject);
+  }
+
   @Get(':id')
   async findUnique(@Param('id') id: string) {
     return await this.studentsService.findUnique(id);

@@ -44,6 +44,25 @@ export class ClassesService {
     return newClass;
   }
 
+  async getByEmployee(employeeId: string) {
+    return await this.prisma.class.findMany({
+      where: {
+        Employee_Subject_Class: {
+          some: {
+            employeeId,
+          },
+        },
+      },
+      include: {
+        Employee_Subject_Class: {
+          where: {
+            employeeId,
+          },
+        },
+      },
+    });
+  }
+
   async update(name: string, updateClassDto: UpdateClassDto) {
     const studentConnections: { id: string }[] = [];
 
@@ -104,6 +123,7 @@ export class ClassesService {
             },
           },
         },
+        Employee_Subject_Class: true,
       },
     });
   }

@@ -13,6 +13,8 @@ import { ClassesModule } from './classes/classes.module';
 import { ClassroomsModule } from './classrooms/classrooms.module';
 import { SchoolHoursModule } from './school-hours/school-hours.module';
 import { LessonsModule } from './lessons/lessons.module';
+import { SchoolYearsModule } from './school-years/school-years.module';
+import { GradesModule } from './grades/grades.module';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { LessonsModule } from './lessons/lessons.module';
     ClassroomsModule,
     SchoolHoursModule,
     LessonsModule,
+    SchoolYearsModule,
+    GradesModule,
   ],
   controllers: [AppController],
 })

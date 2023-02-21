@@ -165,6 +165,38 @@ export class LessonsService {
     });
   }
 
+  async getLessonsByEmployeeAndDateRange(
+    employeeId: string,
+    startDate: string,
+    endDate: string,
+  ) {
+    return await this.prisma.lesson.findMany({
+      where: {
+        employeeId,
+        date: {
+          lte: endDate, // "2022-01-30T00:00:00.000Z"
+          gte: startDate, // "2022-01-15T00:00:00.000Z"
+        },
+      },
+      include: {
+        employee_Subject: {
+          include: {
+            employee: {
+              include: {
+                user: true,
+              },
+            },
+          },
+        },
+        substituteEmployee: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+  }
+
   async findMany() {
     return await this.prisma.lesson.findMany();
   }

@@ -36,6 +36,11 @@ export class ClassesController {
     return await this.classesService.findUnique(name);
   }
 
+  @Get('/by-employee/:employeeId')
+  async getByEmployee(@Param('employeeId') employeeId: string) {
+    return await this.classesService.getByEmployee(employeeId);
+  }
+
   @Post('connect-to-employee-subject/:name')
   async connectToEmployeeSubject(
     @Param('name') name: string,

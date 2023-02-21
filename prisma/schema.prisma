@@ -59,6 +59,7 @@ model Subject {
 
     Employee_Subject    Employee_Subject[]
     Subject_SubjectList Subject_SubjectList[]
+    Grade               Grade[]
 }
 
 model Employee_Subject {
@@ -152,11 +153,16 @@ model Grade {
     type        GradeType
     description String?
 
+    createdAt DateTime @default(now())
+
     student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
     studentId String
 
     schoolYear   SchoolYear @relation(fields: [schoolYearId], references: [id], onDelete: Cascade)
     schoolYearId String
+
+    subject             Subject @relation(fields: [subjectAbbreviation], references: [abbreviation], onDelete: Cascade)
+    subjectAbbreviation String
 }
 
 enum GradeType {

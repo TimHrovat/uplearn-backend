@@ -146,6 +146,7 @@ export class UsersService {
             class: true,
           },
         },
+        Employee: true,
       },
     });
 
