@@ -62,11 +62,49 @@ export class StudentsService {
   }
 
   async findUnique(id: string) {
-    const student = await this.prisma.student.findUnique({ where: { id } });
+    return await this.prisma.student.findUnique({ where: { id } });
+  }
 
-    if (!student) throw new BadRequestException();
+  async getSubjectsWithGrades(id: string) {
+    const subjects = await this.prisma.subject.findMany({
+      where: {
+        Subject_SubjectList: {
+          some: {
+            subjectList: {
+              Class: {
+                some: {
+                  Student: {
+                    some: {
+                      id,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
 
-    return student;
+    const schoolYear = await this.schoolYearsService.getActive();
+
+    if (!schoolYear) throw new BadRequestException('No valid school year');
+
+    const grades = await this.prisma.grade.findMany({
+      where: {
+        AND: [{ studentId: id }, { schoolYearId: schoolYear.id }],
+      },
+    });
+
+    subjects.forEach((subject) => {
+      const filteredGrades = grades.filter(
+        (grade) => grade.subjectAbbreviation === subject.abbreviation,
+      );
+
+      subject['grades'] = filteredGrades;
+    });
+
+    return subjects;
   }
 
   async update(id: string, updateStudentDto: UpdateStudentDto) {

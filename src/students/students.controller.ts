@@ -48,6 +48,11 @@ export class StudentsController {
     return await this.studentsService.findUnique(id);
   }
 
+  @Get('subjects-and-grades/:id')
+  async getSubjectsWithGrades(@Param('id') id: string) {
+    return await this.studentsService.getSubjectsWithGrades(id);
+  }
+
   @Patch(':id')
   async updateById(
     @Param('id') id: string,
