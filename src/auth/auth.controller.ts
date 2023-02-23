@@ -24,6 +24,14 @@ export class AuthController {
     return await this.authService.login(loginUserDto, req, res);
   }
 
+  @Post('/reset-password/:token')
+  async resetPassword(
+    @Param('token') token: string,
+    @Body() replaceFirstPasswordDto: ReplaceFirstPasswordDto,
+  ) {
+    return await this.authService.resetPassword(token, replaceFirstPasswordDto);
+  }
+
   @Get('logout')
   async logout(@Req() req, @Res() res) {
     return await this.authService.logout(req, res);
@@ -32,6 +40,11 @@ export class AuthController {
   @Get('resend-credentials/:id')
   async resendCredentials(@Param('id') id: string) {
     return await this.authService.resendCredentials(id);
+  }
+
+  @Get('send-reset-password-email/:username')
+  async sendForgotPasswordEmail(@Param('username') username: string) {
+    return await this.authService.sendForgotPasswordEmail(username);
   }
 
   @Post('register')

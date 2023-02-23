@@ -67,6 +67,11 @@ export class LessonsController {
     return await this.lessonsService.findUnique(id);
   }
 
+  @Get('upcoming-gradings/:className')
+  async getUpcomingGradings(@Param('className') className: string) {
+    return await this.lessonsService.getUpcomingGradings(className);
+  }
+
   @Delete(':id')
   async delete(@Param('id') id: string) {
     return await this.lessonsService.delete(id);

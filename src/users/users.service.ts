@@ -74,7 +74,7 @@ export class UsersService {
 
     const user = await this.prisma.user.update({
       where: { id },
-      data: updateUserDto,
+      data: { ...updateUserDto, resetPasswordToken: null },
     });
 
     if (!user) throw new BadRequestException();

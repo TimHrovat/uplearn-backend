@@ -224,6 +224,20 @@ export class LessonsService {
     });
   }
 
+  async getUpcomingGradings(className: string) {
+    const currentDate = new Date();
+
+    return await this.prisma.lesson.findMany({
+      where: {
+        AND: [
+          { className },
+          { type: 'GRADING' },
+          { date: { gte: currentDate.toISOString() } },
+        ],
+      },
+    });
+  }
+
   async delete(id: string) {
     return await this.prisma.lesson.delete({ where: { id } });
   }

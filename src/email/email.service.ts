@@ -13,32 +13,12 @@ export class EmailService {
 
   private readonly logger: Logger = new Logger(EmailService.name);
 
-  // TODO: implement this the right way
-  // async sendResetPassword(
-  //   sendResetPasswordDto: SendResetPasswordDto,
-  //   token: string,
-  // ) {
-  //   const url = frontendUrl + `/auth/resetPassword?token=${token}`;
-
-  //   await this.mailerService.sendMail({
-  //     to: sendResetPasswordDto.email,
-  //     // from: '"Support Team" <support@example.com>', // override default from
-  //     subject: 'Welcome to Nice App! Confirm your Email',
-  //     template: './confirmation', // `.hbs` extension is appended automatically
-  //     context: {
-  //       // ✏️ filling curly brackets with content
-  //       name: sendResetPasswordDto.user,
-  //       url,
-  //     },
-  //   });
-  // }
-
   async sendResetPassword(email: string, token: string) {
-    const url = frontendUrl + `/auth/resetPassword?token=${token}`;
+    const url = frontendUrl + `/reset-password?token=${token}`;
 
     await this.mailerService.sendMail({
       to: email,
-      subject: 'Welcome to Nice App! Confirm your Email',
+      subject: 'UpLearn - Reset your password',
       template: './reset_password',
       context: {
         url,

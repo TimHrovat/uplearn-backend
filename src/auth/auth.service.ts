@@ -1,4 +1,5 @@
 import {
+  BadGatewayException,
   BadRequestException,
   ForbiddenException,
   Injectable,
@@ -85,12 +86,60 @@ export class AuthService {
     return user;
   }
 
-  async sendForgotPasswordEmail(userId: string) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+  async sendForgotPasswordEmail(username: string) {
+    const user = await this.prisma.user.findUnique({ where: { username } });
 
     if (!user) {
       throw new BadRequestException('User with this username does not exist');
     }
+
+    const payload = {
+      id: user.id,
+    };
+
+    const token = this.jwtService.sign(payload, { secret: jwtSecret });
+
+    const updatedUser = await this.prisma.user.update({
+      where: { username },
+      data: { resetPasswordToken: token },
+    });
+
+    if (!updatedUser) {
+      throw new BadRequestException('Something went wrong please try again');
+    }
+
+    await this.emailService
+      .sendResetPassword(user.email, token)
+      .catch(async () => {
+        throw new BadRequestException(
+          "Couldn't send message to provided email",
+        );
+      });
+
+    delete user.firstPassword;
+    delete user.password;
+
+    return user;
+  }
+
+  async resetPassword(
+    token: string,
+    replaceFirstPasswordDto: ReplaceFirstPasswordDto,
+  ) {
+    const decoded = this.jwtService.decode(token);
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: decoded['id'] },
+    });
+
+    if (user.resetPasswordToken !== token)
+      throw new BadGatewayException('Invalid password reset token');
+
+    return await this.usersService.updateById(decoded['id'], {
+      firstPassword: null,
+      firstPasswordReplaced: true,
+      password: replaceFirstPasswordDto.password,
+    });
   }
 
   async resendCredentials(id: string) {
