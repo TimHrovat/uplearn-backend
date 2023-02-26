@@ -17,6 +17,7 @@ import { SchoolYearsModule } from './school-years/school-years.module';
 import { GradesModule } from './grades/grades.module';
 import { AbsencesModule } from './absences/absences.module';
 import { EventsModule } from './events/events.module';
+import { EmployeeGradesModule } from './employee-grades/employee-grades.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { EventsModule } from './events/events.module';
     GradesModule,
     AbsencesModule,
     EventsModule,
+    EmployeeGradesModule,
   ],
   controllers: [AppController],
 })
