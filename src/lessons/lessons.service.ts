@@ -215,6 +215,20 @@ export class LessonsService {
             subject: true,
           },
         },
+        class: {
+          include: {
+            Student: {
+              include: {
+                user: true,
+                Absence: {
+                  where: {
+                    lessonId: id,
+                  },
+                },
+              },
+            },
+          },
+        },
         substituteEmployee: {
           include: {
             user: true,

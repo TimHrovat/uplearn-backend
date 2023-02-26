@@ -48,6 +48,7 @@ model Employee {
     ClassTeacher           Class?             @relation("class-teacher")
     SubstituteClassTeacher Class?             @relation("substitute-class-teacher")
     SubstituteLesson       Lesson[]
+    Event_Teacher          Event_Employee[]
 
     @@id([id, userId])
 }
@@ -109,7 +110,8 @@ model Class {
     substituteClassTeacher   Employee? @relation(name: "substitute-class-teacher", fields: [substituteClassTeacherId], references: [id], onDelete: Restrict)
     substituteClassTeacherId String?   @unique
 
-    Lesson Lesson[]
+    Lesson      Lesson[]
+    Event_Class Event_Class[]
 }
 
 model Employee_Subject_Class {
@@ -173,8 +175,8 @@ enum GradeType {
 
 model SchoolHour {
     id        String   @id @default(uuid())
-    startTime DateTime @unique @db.Time
-    endTime   DateTime @unique @db.Time
+    startTime DateTime @unique @db.Time()
+    endTime   DateTime @unique @db.Time()
     Lesson    Lesson[]
 }
 
@@ -227,8 +229,6 @@ enum LessonType {
 model Absence {
     id String @id @default(uuid())
 
-    description String?
-
     lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
     lessonId String
 
@@ -237,4 +237,43 @@ model Absence {
 
     schoolYear   SchoolYear @relation(fields: [schoolYearId], references: [id], onDelete: Cascade)
     schoolYearId String
+}
+
+model Event {
+    id String @id @default(uuid())
+
+    date      DateTime  @db.Date
+    startTime String?
+    endTime   String?
+    type      EventType
+
+    description String?
+
+    Event_Teacher Event_Employee[]
+    Event_Class   Event_Class[]
+}
+
+model Event_Employee {
+    event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    eventId String
+
+    employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+    employeeId String
+
+    @@id([eventId, employeeId])
+}
+
+model Event_Class {
+    event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+    eventId String
+
+    class     Class  @relation(fields: [className], references: [name], onDelete: Cascade)
+    className String
+
+    @@id([eventId, className])
+}
+
+enum EventType {
+    ACT // activity
+    HOLLIDAY
 }

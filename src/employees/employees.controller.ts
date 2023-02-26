@@ -35,6 +35,11 @@ export class EmployeesController {
     return await this.employeesService.findAll();
   }
 
+  @Get('ongoing-lesson/:id')
+  async getOngoingLesson(@Param('id') id: string) {
+    return await this.employeesService.getOngoingLesson(id);
+  }
+
   @Get('non-class-teachers')
   async findAllNonClassTeachers() {
     return await this.employeesService.findAllNonClassTeachers();

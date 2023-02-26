@@ -16,6 +16,7 @@ import { LessonsModule } from './lessons/lessons.module';
 import { SchoolYearsModule } from './school-years/school-years.module';
 import { GradesModule } from './grades/grades.module';
 import { AbsencesModule } from './absences/absences.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { AbsencesModule } from './absences/absences.module';
     SchoolYearsModule,
     GradesModule,
     AbsencesModule,
+    EventsModule,
   ],
   controllers: [AppController],
 })

@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import * as moment from 'moment';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AddToSubjectDto } from './dto/add-to-subject.dto';
 import { CreateEmployeeDto } from './dto/create-employee.dto';
@@ -49,6 +50,28 @@ export class EmployeesService {
       },
       include: {
         user: true,
+      },
+    });
+  }
+
+  async getOngoingLesson(id: string) {
+    const date = new Date();
+
+    return await this.prisma.lesson.findFirst({
+      where: {
+        employeeId: id,
+        date: date,
+        schoolHour: {
+          endTime: {
+            gte: date,
+          },
+          startTime: {
+            lte: date,
+          },
+        },
+      },
+      include: {
+        schoolHour: true,
       },
     });
   }
