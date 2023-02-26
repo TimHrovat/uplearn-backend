@@ -4,14 +4,19 @@ import { EmailController } from './email.controller';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { join } from 'path';
-import { emailPassword, emailService, emailUser } from 'src/utils/constants';
+import {
+  emailPassword,
+  emailService,
+  emailUser,
+  emailPort,
+} from 'src/utils/constants';
 
 @Module({
   imports: [
     MailerModule.forRoot({
       transport: {
         host: emailService,
-        port: 587,
+        port: Number(emailPort),
         secure: false,
         auth: {
           user: emailUser,
@@ -19,7 +24,7 @@ import { emailPassword, emailService, emailUser } from 'src/utils/constants';
         },
       },
       defaults: {
-        from: '"No Reply" <phosphor@bogi.si>',
+        from: `"No Reply" <${emailUser}>`,
       },
       template: {
         dir: join(__dirname, '../../email/templates'),
