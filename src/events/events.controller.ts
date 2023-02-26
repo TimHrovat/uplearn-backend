@@ -24,6 +24,11 @@ export class EventsController {
     );
   }
 
+  @Get('upcoming/:className')
+  async getUpcomingEvents(@Param('className') className: string) {
+    return await this.eventsService.getUpcomingEvents(className);
+  }
+
   @Get('events-by-employee-and-date-range/:employeeid/:start/:end')
   async getEventsByEmployeeAndDateRange(
     @Param('employeeid') employeeId: string,

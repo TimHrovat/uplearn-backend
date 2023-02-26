@@ -229,6 +229,8 @@ enum LessonType {
 model Absence {
     id String @id @default(uuid())
 
+    state AbsenceState @default(UNEXCUSED)
+
     lesson   Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
     lessonId String
 
@@ -237,6 +239,11 @@ model Absence {
 
     schoolYear   SchoolYear @relation(fields: [schoolYearId], references: [id], onDelete: Cascade)
     schoolYearId String
+}
+
+enum AbsenceState {
+    EXCUSED
+    UNEXCUSED
 }
 
 model Event {

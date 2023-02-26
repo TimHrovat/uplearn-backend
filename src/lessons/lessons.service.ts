@@ -249,6 +249,9 @@ export class LessonsService {
           { date: { gte: currentDate.toISOString() } },
         ],
       },
+      orderBy: {
+        date: 'asc',
+      },
     });
   }
 

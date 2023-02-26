@@ -41,6 +41,11 @@ export class ClassesController {
     return await this.classesService.getByEmployee(employeeId);
   }
 
+  @Get('/by-class-teacher/:employeeId')
+  async getByClassTeacher(@Param('employeeId') employeeId: string) {
+    return await this.classesService.getByClassTeacher(employeeId);
+  }
+
   @Post('connect-to-employee-subject/:name')
   async connectToEmployeeSubject(
     @Param('name') name: string,

@@ -108,6 +108,28 @@ export class EventsService {
     });
   }
 
+  async getUpcomingEvents(className: string) {
+    const currentDate = new Date();
+
+    return await this.prisma.event.findMany({
+      where: {
+        AND: [
+          {
+            Event_Class: {
+              some: {
+                className,
+              },
+            },
+          },
+          { date: { gte: currentDate.toISOString() } },
+        ],
+      },
+      orderBy: {
+        date: 'asc',
+      },
+    });
+  }
+
   async delete(id: string) {
     return await this.prisma.event.delete({
       where: {

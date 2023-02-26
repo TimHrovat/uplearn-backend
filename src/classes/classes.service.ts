@@ -63,6 +63,24 @@ export class ClassesService {
     });
   }
 
+  async getByClassTeacher(employeeId: string) {
+    return await this.prisma.class.findMany({
+      where: {
+        OR: [
+          { classTeacherId: employeeId },
+          { substituteClassTeacherId: employeeId },
+        ],
+      },
+      include: {
+        Student: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+  }
+
   async update(name: string, updateClassDto: UpdateClassDto) {
     const studentConnections: { id: string }[] = [];
 
