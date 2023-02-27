@@ -203,14 +203,15 @@ export class AuthService {
       throw new ForbiddenException('No token');
     }
 
-    res.cookie('token', token, {
-      sameSite: 'strict',
-      secure: true,
-    });
+    // res.cookie('token', token, {
+    //   sameSite: 'strict',
+    //   secure: true,
+    //   httpOnly: false,
+    // });
 
-    res.status(200);
+    // res.status(200);
 
-    return res.send({ message: 'First password replaced successfully' });
+    return res.send({ message: 'First password replaced successfully', token });
   }
 
   async login(loginUserDto: LoginUserDto, req: Request, res: Response) {
@@ -228,14 +229,15 @@ export class AuthService {
       throw new ForbiddenException('No token');
     }
 
-    res.cookie('token', token, {
-      sameSite: 'strict',
-      secure: true,
-    });
+    // res.cookie('token', token, {
+    //   sameSite: 'strict',
+    //   secure: true,
+    //   httpOnly: false,
+    // });
 
-    res.status(200);
+    // res.status(200);
 
-    return res.send({ message: 'Logged in succesfully' });
+    return res.send({ message: 'Logged in succesfully', token });
   }
 
   async logout(req: Request, res: Response) {
