@@ -203,7 +203,7 @@ export class AuthService {
       throw new ForbiddenException('No token');
     }
 
-    res.cookie('token', token, { sameSite: 'none', secure: true });
+    res.cookie('token', token, { sameSite: 'strict', secure: true });
 
     return res.send({ message: 'First password replaced successfully' });
   }
@@ -223,7 +223,7 @@ export class AuthService {
       throw new ForbiddenException('No token');
     }
 
-    res.cookie('token', token, { sameSite: 'none', secure: true });
+    res.cookie('token', token, { sameSite: 'strict', secure: true });
 
     return res.send({ message: 'Logged in succesfully' });
   }
