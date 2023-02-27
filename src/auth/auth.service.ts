@@ -204,10 +204,11 @@ export class AuthService {
     }
 
     res.cookie('token', token, {
-      sameSite: 'none',
+      sameSite: 'strict',
       secure: true,
-      httpOnly: false,
     });
+
+    res.status(200);
 
     return res.send({ message: 'First password replaced successfully' });
   }
@@ -228,10 +229,11 @@ export class AuthService {
     }
 
     res.cookie('token', token, {
-      sameSite: 'none',
+      sameSite: 'strict',
       secure: true,
-      httpOnly: false,
     });
+
+    res.status(200);
 
     return res.send({ message: 'Logged in succesfully' });
   }
