@@ -88,8 +88,8 @@ export class UsersService {
   async updateAuthenticated(updateUserDto: UpdateUserDto, req: Request) {
     let reqToken = null;
 
-    if (req.cookies && 'token' in req.cookies) {
-      reqToken = req.cookies.token;
+    if (req.headers.authorization !== '') {
+      reqToken = req.headers.authorization;
     } else {
       return;
     }

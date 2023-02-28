@@ -177,8 +177,8 @@ export class AuthService {
   ) {
     let reqToken = null;
 
-    if (req.cookies && 'token' in req.cookies) {
-      reqToken = req.cookies.token;
+    if (req.headers.authorization !== '') {
+      reqToken = req.headers.authorization;
     } else {
       return;
     }
@@ -203,14 +203,6 @@ export class AuthService {
       throw new ForbiddenException('No token');
     }
 
-    // res.cookie('token', token, {
-    //   sameSite: 'strict',
-    //   secure: true,
-    //   httpOnly: false,
-    // });
-
-    // res.status(200);
-
     return res.send({ message: 'First password replaced successfully', token });
   }
 
@@ -228,14 +220,6 @@ export class AuthService {
     if (!token) {
       throw new ForbiddenException('No token');
     }
-
-    // res.cookie('token', token, {
-    //   sameSite: 'strict',
-    //   secure: true,
-    //   httpOnly: false,
-    // });
-
-    // res.status(200);
 
     return res.send({ message: 'Logged in succesfully', token });
   }
