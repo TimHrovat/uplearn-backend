@@ -49,7 +49,6 @@ export class UsersService {
     const firstPassword = generate({
       length: 16,
       numbers: true,
-      symbols: true,
     });
 
     const password = await this.hashPassword(firstPassword);
