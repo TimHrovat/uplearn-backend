@@ -21,11 +21,6 @@ import { UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post('create')
-  async create(@Body() createUserDto: CreateUserDto) {
-    return await this.usersService.create(createUserDto);
-  }
-
   @Get('get-all/:adminId')
   async findAll(@Param('adminId') adminId: string) {
     return await this.usersService.findMany(adminId);

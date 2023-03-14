@@ -1,12 +1,16 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UsersService } from 'src/users/users.service';
 import { ConnectToEmployeeSubjectDto } from './dto/connect-to-employee-subject.dto';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
 
 @Injectable()
 export class ClassesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly usersService: UsersService,
+  ) {}
 
   private readonly logger: Logger = new Logger(ClassesService.name);
 
@@ -74,7 +78,9 @@ export class ClassesService {
       include: {
         Student: {
           include: {
-            user: true,
+            user: {
+              select: this.usersService.userSelect,
+            },
           },
         },
       },
@@ -119,24 +125,32 @@ export class ClassesService {
       include: {
         Student: {
           include: {
-            user: true,
+            user: {
+              select: this.usersService.userSelect,
+            },
           },
         },
         classTeacher: {
           include: {
-            user: true,
+            user: {
+              select: this.usersService.userSelect,
+            },
           },
         },
         substituteClassTeacher: {
           include: {
-            user: true,
+            user: {
+              select: this.usersService.userSelect,
+            },
           },
         },
         subjectList: {
           include: {
             Subject_SubjectList: {
               include: {
-                subject: true,
+                subject: {
+                  select: this.usersService.userSelect,
+                },
               },
             },
           },
@@ -201,17 +215,23 @@ export class ClassesService {
       include: {
         Student: {
           include: {
-            user: true,
+            user: {
+              select: this.usersService.userSelect,
+            },
           },
         },
         classTeacher: {
           include: {
-            user: true,
+            user: {
+              select: this.usersService.userSelect,
+            },
           },
         },
         substituteClassTeacher: {
           include: {
-            user: true,
+            user: {
+              select: this.usersService.userSelect,
+            },
           },
         },
         subjectList: {
@@ -224,7 +244,9 @@ export class ClassesService {
                       include: {
                         employee: {
                           include: {
-                            user: true,
+                            user: {
+                              select: this.usersService.userSelect,
+                            },
                           },
                         },
                       },
@@ -241,7 +263,9 @@ export class ClassesService {
               include: {
                 employee: {
                   include: {
-                    user: true,
+                    user: {
+                      select: this.usersService.userSelect,
+                    },
                   },
                 },
               },

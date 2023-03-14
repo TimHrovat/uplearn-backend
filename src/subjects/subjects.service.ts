@@ -1,12 +1,16 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UsersService } from 'src/users/users.service';
 import { CreateSubjectManyDto } from './dto/create-subject-many.dto';
 import { CreateSubjectDto } from './dto/create-subject.dto';
 import { UpdateSubjectDto } from './dto/update-subject.dto';
 
 @Injectable()
 export class SubjectsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly usersService: UsersService,
+  ) {}
 
   private readonly logger: Logger = new Logger(SubjectsService.name);
 
@@ -70,7 +74,9 @@ export class SubjectsService {
           include: {
             employee: {
               include: {
-                user: true,
+                user: {
+                  select: this.usersService.userSelect,
+                },
               },
             },
           },

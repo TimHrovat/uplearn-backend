@@ -7,7 +7,7 @@ import { SchoolYearsModule } from 'src/school-years/school-years.module';
 @Module({
   controllers: [StudentsController],
   providers: [StudentsService],
-  imports: [PrismaModule, SchoolYearsModule],
+  imports: [PrismaModule, SchoolYearsModule, PrismaModule],
   exports: [StudentsService],
 })
 export class StudentsModule {}

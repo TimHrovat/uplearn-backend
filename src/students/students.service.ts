@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SchoolYearsService } from 'src/school-years/school-years.service';
+import { UsersService } from 'src/users/users.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 
@@ -9,6 +10,7 @@ export class StudentsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly schoolYearsService: SchoolYearsService,
+    private readonly usersService: UsersService,
   ) {}
 
   private readonly logger: Logger = new Logger(StudentsService.name);
@@ -28,13 +30,23 @@ export class StudentsService {
   }
 
   async findAll() {
-    return await this.prisma.student.findMany({ include: { user: true } });
+    return await this.prisma.student.findMany({
+      include: {
+        user: {
+          select: this.usersService.userSelect,
+        },
+      },
+    });
   }
 
   async findAllWithoutClass() {
     return await this.prisma.student.findMany({
       where: { class: null },
-      include: { user: true },
+      include: {
+        user: {
+          select: this.usersService.userSelect,
+        },
+      },
     });
   }
 
@@ -56,7 +68,9 @@ export class StudentsService {
             ],
           },
         },
-        user: true,
+        user: {
+          select: this.usersService.userSelect,
+        },
       },
     });
   }

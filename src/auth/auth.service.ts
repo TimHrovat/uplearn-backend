@@ -83,6 +83,11 @@ export class AuthService {
 
     this.logger.verbose('user created');
 
+    delete user.firstPassword;
+    delete user.firstPasswordReplaced;
+    delete user.password;
+    delete user.resetPasswordToken;
+
     return user;
   }
 
@@ -117,7 +122,9 @@ export class AuthService {
       });
 
     delete user.firstPassword;
+    delete user.firstPasswordReplaced;
     delete user.password;
+    delete user.resetPasswordToken;
 
     return user;
   }
@@ -165,7 +172,9 @@ export class AuthService {
       });
 
     delete user.firstPassword;
+    delete user.firstPasswordReplaced;
     delete user.password;
+    delete user.resetPasswordToken;
 
     return user;
   }

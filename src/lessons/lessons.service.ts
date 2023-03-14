@@ -4,10 +4,14 @@ import { CreateLessonDto } from './dto/create-lesson.dto';
 import { v4 as uuid } from 'uuid';
 import { CreateManyLessonsDto } from './dto/create-many-lessons.dto';
 import * as moment from 'moment';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class LessonsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly usersService: UsersService,
+  ) {}
 
   async create(createLessonDto: CreateLessonDto) {
     const checkTeachers = await this.prisma.employee.findMany({
@@ -151,14 +155,18 @@ export class LessonsService {
           include: {
             employee: {
               include: {
-                user: true,
+                user: {
+                  select: this.usersService.userSelect,
+                },
               },
             },
           },
         },
         substituteEmployee: {
           include: {
-            user: true,
+            user: {
+              select: this.usersService.userSelect,
+            },
           },
         },
       },
@@ -183,14 +191,18 @@ export class LessonsService {
           include: {
             employee: {
               include: {
-                user: true,
+                user: {
+                  select: this.usersService.userSelect,
+                },
               },
             },
           },
         },
         substituteEmployee: {
           include: {
-            user: true,
+            user: {
+              select: this.usersService.userSelect,
+            },
           },
         },
       },
@@ -209,7 +221,9 @@ export class LessonsService {
           include: {
             employee: {
               include: {
-                user: true,
+                user: {
+                  select: this.usersService.userSelect,
+                },
               },
             },
             subject: true,
@@ -219,7 +233,9 @@ export class LessonsService {
           include: {
             Student: {
               include: {
-                user: true,
+                user: {
+                  select: this.usersService.userSelect,
+                },
                 Absence: {
                   where: {
                     lessonId: id,
@@ -231,7 +247,9 @@ export class LessonsService {
         },
         substituteEmployee: {
           include: {
-            user: true,
+            user: {
+              select: this.usersService.userSelect,
+            },
           },
         },
       },

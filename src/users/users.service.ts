@@ -28,6 +28,19 @@ export class UsersService {
 
   private readonly logger: Logger = new Logger(UsersService.name);
 
+  userSelect: Prisma.UserSelect = {
+    createdAt: true,
+    dateOfBirth: true,
+    email: true,
+    gsm: true,
+    id: true,
+    name: true,
+    surname: true,
+    username: true,
+    updatedAt: true,
+    role: true,
+  };
+
   async create(createUserDto: CreateUserDto) {
     const firstPassword = generate({
       length: 16,
@@ -79,8 +92,10 @@ export class UsersService {
 
     if (!user) throw new BadRequestException();
 
-    delete user.password;
     delete user.firstPassword;
+    delete user.firstPasswordReplaced;
+    delete user.password;
+    delete user.resetPasswordToken;
 
     return user;
   }
@@ -131,6 +146,11 @@ export class UsersService {
         data: updateUserDto,
       });
 
+      delete updatedUser.firstPassword;
+      delete updatedUser.firstPasswordReplaced;
+      delete updatedUser.password;
+      delete updatedUser.resetPasswordToken;
+
       return updatedUser;
     } catch (e) {
       throw new BadRequestException('This username already exists.');
@@ -153,7 +173,9 @@ export class UsersService {
     if (!user) throw new BadRequestException();
 
     delete user.firstPassword;
+    delete user.firstPasswordReplaced;
     delete user.password;
+    delete user.resetPasswordToken;
 
     return user;
   }
@@ -164,16 +186,7 @@ export class UsersService {
         id: { not: adminId },
       },
       orderBy: [{ name: 'asc' }, { surname: 'asc' }],
-      select: {
-        id: true,
-        name: true,
-        surname: true,
-        email: true,
-        username: true,
-        dateOfBirth: true,
-        role: true,
-        gsm: true,
-      },
+      select: this.userSelect,
     });
   }
 

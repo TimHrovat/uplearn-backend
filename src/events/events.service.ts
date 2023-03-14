@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UsersService } from 'src/users/users.service';
 import { CreateEventDto } from './dto/create-event.dto';
 
 @Injectable()
 export class EventsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly usersService: UsersService,
+  ) {}
 
   async create(createEventDto: CreateEventDto) {
     const { classes, employees, ...other } = createEventDto;
@@ -56,14 +60,18 @@ export class EventsService {
       include: {
         Event_Class: {
           include: {
-            class: true,
+            class: {
+              select: this.usersService.userSelect,
+            },
           },
         },
         Event_Teacher: {
           include: {
             employee: {
               include: {
-                user: true,
+                user: {
+                  select: this.usersService.userSelect,
+                },
               },
             },
           },
@@ -99,7 +107,9 @@ export class EventsService {
           include: {
             employee: {
               include: {
-                user: true,
+                user: {
+                  select: this.usersService.userSelect,
+                },
               },
             },
           },
