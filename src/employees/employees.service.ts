@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  forwardRef,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersService } from 'src/users/users.service';
 import { AddToSubjectDto } from './dto/add-to-subject.dto';
@@ -8,8 +14,8 @@ import { CreateEmployeeDto } from './dto/create-employee.dto';
 export class EmployeesService {
   constructor(
     private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
-    ƒ,
   ) {}
 
   private readonly logger: Logger = new Logger(EmployeesService.name);

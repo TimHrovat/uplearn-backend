@@ -148,9 +148,7 @@ export class ClassesService {
           include: {
             Subject_SubjectList: {
               include: {
-                subject: {
-                  select: this.usersService.userSelect,
-                },
+                subject: true,
               },
             },
           },

@@ -8,7 +8,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { RolesGuard } from 'src/auth/role.guard';
+import { Roles } from 'src/decorators/role.decorator';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { CreateManyLessonsDto } from './dto/create-many-lessons.dto';
 import { LessonsService } from './lessons.service';
@@ -31,6 +34,8 @@ export class LessonsController {
     );
   }
 
+  @Roles(Role.student, Role.employee)
+  @UseGuards(RolesGuard)
   @Get('lessons-by-class-and-date-range/:name/:start/:end')
   async getLessonsByClassAndDateRange(
     @Param('name') className: string,

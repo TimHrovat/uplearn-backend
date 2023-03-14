@@ -60,9 +60,7 @@ export class EventsService {
       include: {
         Event_Class: {
           include: {
-            class: {
-              select: this.usersService.userSelect,
-            },
+            class: true,
           },
         },
         Event_Teacher: {
