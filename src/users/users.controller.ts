@@ -28,7 +28,6 @@ export class UsersController {
     return await this.usersService.findMany(adminId);
   }
 
-  @Roles(Role.admin)
   @Get(':id')
   async findUnique(@Param('id') id: string) {
     return await this.usersService.findUnique(id);
