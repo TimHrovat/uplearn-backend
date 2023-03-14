@@ -18,15 +18,17 @@ import { LessonsService } from './lessons.service';
 
 @Controller('lessons')
 @ApiTags('Lessons')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class LessonsController {
   constructor(private readonly lessonsService: LessonsService) {}
 
+  @Roles(Role.employee, Role.admin)
   @Post('create')
   async create(@Body() createLessonDto: CreateLessonDto) {
     return await this.lessonsService.create(createLessonDto);
   }
 
+  @Roles(Role.employee, Role.admin)
   @Post('create-many')
   async createMany(@Body() createManyLessonsDto: CreateManyLessonsDto) {
     return await this.lessonsService.createLessonsForWholeSchoolYear(
@@ -34,8 +36,6 @@ export class LessonsController {
     );
   }
 
-  @Roles(Role.student, Role.employee)
-  @UseGuards(RolesGuard)
   @Get('lessons-by-class-and-date-range/:name/:start/:end')
   async getLessonsByClassAndDateRange(
     @Param('name') className: string,
@@ -49,6 +49,7 @@ export class LessonsController {
     );
   }
 
+  @Roles(Role.employee, Role.admin)
   @Get('lessons-by-employee-and-date-range/:employeeId/:start/:end')
   async getLessonsByEmployeeAndDateRange(
     @Param('employeeId') employeeId: string,
@@ -77,11 +78,13 @@ export class LessonsController {
     return await this.lessonsService.getUpcomingGradings(className);
   }
 
+  @Roles(Role.employee, Role.admin)
   @Delete(':id')
   async delete(@Param('id') id: string) {
     return await this.lessonsService.delete(id);
   }
 
+  @Roles(Role.employee, Role.admin)
   @Delete('delete-many/:lessonGroupId')
   async deleteMany(@Param('lessonGroupId') lessonGroupId: string) {
     return await this.lessonsService.deleteMany(lessonGroupId);

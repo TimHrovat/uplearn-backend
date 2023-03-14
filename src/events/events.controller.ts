@@ -1,11 +1,27 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
+import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { RolesGuard } from 'src/auth/role.guard';
+import { Roles } from 'src/decorators/role.decorator';
 import { CreateEventDto } from './dto/create-event.dto';
 import { EventsService } from './events.service';
 
 @Controller('events')
+@ApiTags('Events')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
+  @Roles(Role.admin, Role.employee)
   @Post('create')
   async create(@Body() createEventDto: CreateEventDto) {
     return await this.eventsService.create(createEventDto);
@@ -42,6 +58,7 @@ export class EventsController {
     );
   }
 
+  @Roles(Role.admin, Role.employee)
   @Delete(':id')
   async delete(@Param('id') id: string) {
     return await this.eventsService.delete(id);

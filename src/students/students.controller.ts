@@ -13,13 +13,17 @@ import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { RolesGuard } from 'src/auth/role.guard';
+import { Roles } from 'src/decorators/role.decorator';
+import { Role } from '@prisma/client';
 
 @Controller('students')
 @ApiTags('Students')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 
+  @Roles(Role.admin)
   @Post('create')
   async create(@Body() createStudentDto: CreateStudentDto) {
     return await this.studentsService.create(createStudentDto);
@@ -53,6 +57,7 @@ export class StudentsController {
     return await this.studentsService.getSubjectsWithGrades(id);
   }
 
+  @Roles(Role.admin)
   @Patch(':id')
   async updateById(
     @Param('id') id: string,
@@ -61,11 +66,13 @@ export class StudentsController {
     return await this.studentsService.update(id, updateStudentDto);
   }
 
+  @Roles(Role.admin)
   @Patch('remove-from-class/:id')
   async removeFromClass(@Param('id') id: string) {
     return await this.studentsService.removeFromClass(id);
   }
 
+  @Roles(Role.admin)
   @Delete(':id')
   async delete(@Param('id') id: string) {
     return await this.studentsService.delete(id);
