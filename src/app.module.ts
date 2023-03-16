@@ -18,6 +18,7 @@ import { GradesModule } from './grades/grades.module';
 import { AbsencesModule } from './absences/absences.module';
 import { EventsModule } from './events/events.module';
 import { EmployeeGradesModule } from './employee-grades/employee-grades.module';
+import { CsvModule } from './csv/csv.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { EmployeeGradesModule } from './employee-grades/employee-grades.module';
     AbsencesModule,
     EventsModule,
     EmployeeGradesModule,
+    CsvModule,
   ],
   controllers: [AppController],
 })

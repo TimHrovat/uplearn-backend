@@ -10,7 +10,7 @@ import { EmailModule } from 'src/email/email.module';
 @Module({
   controllers: [AuthController],
   providers: [AuthService],
-
+  exports: [AuthService],
   imports: [PrismaModule, UsersModule, PassportModule, JwtModule, EmailModule],
 })
 export class AuthModule {}
