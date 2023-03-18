@@ -4,6 +4,7 @@ import { Workbook } from 'exceljs';
 import { AuthService } from 'src/auth/auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { Response } from 'express';
+import * as fs from 'fs';
 
 @Injectable()
 export class ExcelService {
@@ -11,16 +12,29 @@ export class ExcelService {
 
   async addUsersExcel(res: Response) {
     const workBook = new Workbook();
+
+    if (!workBook) throw new BadRequestException("Excel couldn't load");
+
     await workBook.xlsx.readFile('uploads/xlsx/import.xlsx');
 
-    const sheet = workBook.getWorksheet('Sheet1');
+    const sheet = workBook.getWorksheet('data');
+
+    if (!sheet)
+      throw new BadRequestException(
+        "Don't change the sheet name in the excel file",
+      );
 
     sheet.eachRow((row, rowNumber) => {
       if (rowNumber === 1) return;
 
-      // console.log(values[0]);
       row.eachCell({ includeEmpty: true }, function (cell, cellNumber) {
         if (cellNumber === 4) return;
+
+        if (
+          cellNumber === 6 &&
+          !['admin', 'employee', 'student'].includes(cell.text)
+        )
+          throw new BadRequestException('Provide a valid role');
 
         if (cell.text === '') {
           throw new BadRequestException('Failed to register users');
@@ -32,45 +46,17 @@ export class ExcelService {
         surname: row.getCell(2).text,
         email: row.getCell(3).text,
         gsm: row.getCell(4).text,
-        dateOfBirth: row.getCell(5).text,
+        dateOfBirth: new Date(row.getCell(5).text).toISOString(),
         role: Role[row.getCell(6).text],
       };
-
-      // console.log(userData);
 
       this.authService.registerUser(userData);
     });
 
+    fs.unlink('uploads/xlsx/import.xlsx', (err) => {
+      if (err) console.error(err);
+    });
+
     return res.send({ message: 'Users added successfully' });
-
-    // const csvFile = readFileSync('uploads/csv/import.csv');
-    // const csvString = csvFile.toString();
-
-    // try {
-    //   parse(csvString, {
-    //     header: false,
-    //     complete: (result: any) => {
-    //       const data = result.data;
-    //       data.shift();
-
-    //       console.log(data);
-
-    //       data.forEach((d: any) => {
-    //         const userData: CreateUserDto = {
-    //           name: d[0],
-    //           surname: d[1],
-    //           email: d[2],
-    //           gsm: d[3],
-    //           dateOfBirth: d[4],
-    //           role: d[5],
-    //         };
-
-    //         this.authService.registerUser(userData);
-    //       });
-    //     },
-    //   });
-    // } catch {
-    //   throw new BadRequestException('Failed to register users');
-    // }
   }
 }
