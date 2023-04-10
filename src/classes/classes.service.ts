@@ -51,21 +51,11 @@ export class ClassesService {
   async getByEmployee(employeeId: string) {
     return await this.prisma.class.findMany({
       where: {
-        OR: [
-          {
-            Employee_Subject_Class: {
-              some: {
-                employeeId,
-              },
-            },
+        Employee_Subject_Class: {
+          some: {
+            employeeId,
           },
-          {
-            classTeacherId: employeeId,
-          },
-          {
-            substituteClassTeacherId: employeeId,
-          },
-        ],
+        },
       },
       include: {
         Employee_Subject_Class: {
