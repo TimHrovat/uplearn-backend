@@ -72,7 +72,8 @@ export class EmployeesService {
 
   async getOngoingLesson(id: string) {
     const date = new Date();
-    date.setHours(date.getHours() - 1);
+    // server is on different timezone
+    date.setHours(date.getHours() + 1);
 
     return await this.prisma.lesson.findFirst({
       where: {
