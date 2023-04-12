@@ -1,7 +1,7 @@
 # UpLearn Backend
 
 ## Description
-This is the backend of UpLearn, an organisational system for educational establishments. It was created by [Tim Hrovat](https://timhrovat.com) as a graduation project at [Vegova, Ljubljana](https://www.vegova.si).
+This is the backend of UpLearn, an organizational system for educational establishments. It was created by [Tim Hrovat](https://timhrovat.com) as a graduation project at [Vegova, Ljubljana](https://www.vegova.si).
 
 Other repositories can be found [here](https://github.com/UpLearnOrg).
 
