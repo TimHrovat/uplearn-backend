@@ -96,7 +96,6 @@ export class UsersService {
     if (!user) throw new BadRequestException();
 
     delete user.firstPassword;
-    delete user.firstPasswordReplaced;
     delete user.password;
     delete user.resetPasswordToken;
 
@@ -176,7 +175,6 @@ export class UsersService {
     if (!user) throw new BadRequestException();
 
     delete user.firstPassword;
-    delete user.firstPasswordReplaced;
     delete user.password;
     delete user.resetPasswordToken;
 
