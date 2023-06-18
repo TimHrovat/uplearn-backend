@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  UseGuards,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { v4 as uuid } from 'uuid';
@@ -13,54 +18,17 @@ export class LessonsService {
     private readonly usersService: UsersService,
   ) {}
 
-  async create(createLessonDto: CreateLessonDto) {
-    const checkTeachers = await this.prisma.employee.findMany({
-      where: {
-        AND: [
-          {
-            id:
-              createLessonDto.employeeId ??
-              createLessonDto.substituteEmployeeId,
-          },
-          {
-            OR: [
-              {
-                Employee_Subject: {
-                  some: {
-                    Employee_Subject_Class: {
-                      some: {
-                        class: {
-                          Lesson: {
-                            some: {
-                              date: { equals: createLessonDto.date },
-                              schoolHourId: {
-                                equals: createLessonDto.schoolHourId,
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-              {
-                SubstituteLesson: {
-                  some: {
-                    date: { equals: createLessonDto.date },
-                    schoolHourId: {
-                      equals: createLessonDto.schoolHourId,
-                    },
-                  },
-                },
-              },
-            ],
-          },
-        ],
-      },
-    });
+  private readonly logger: Logger = new Logger(UsersService.name);
 
-    if (checkTeachers.length !== 0)
+  async create(createLessonDto: CreateLessonDto) {
+    const teacherAvalible = await this.checkTeacherAvailability(
+      createLessonDto.employeeId,
+      createLessonDto.substituteEmployeeId,
+      createLessonDto.date,
+      createLessonDto.schoolHourId,
+    );
+
+    if (!teacherAvalible)
       throw new BadRequestException(
         'This teacher already has a class at this time',
       );
@@ -71,53 +39,14 @@ export class LessonsService {
   async createLessonsForWholeSchoolYear(
     createManyLessonsDto: CreateManyLessonsDto,
   ) {
-    const checkTeachers = await this.prisma.employee.findMany({
-      where: {
-        AND: [
-          {
-            id:
-              createManyLessonsDto.employeeId ??
-              createManyLessonsDto.substituteEmployeeId,
-          },
-          {
-            OR: [
-              {
-                Employee_Subject: {
-                  some: {
-                    Employee_Subject_Class: {
-                      some: {
-                        class: {
-                          Lesson: {
-                            some: {
-                              date: { equals: createManyLessonsDto.date },
-                              schoolHourId: {
-                                equals: createManyLessonsDto.schoolHourId,
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-              {
-                SubstituteLesson: {
-                  some: {
-                    date: { equals: createManyLessonsDto.date },
-                    schoolHourId: {
-                      equals: createManyLessonsDto.schoolHourId,
-                    },
-                  },
-                },
-              },
-            ],
-          },
-        ],
-      },
-    });
+    const teacherAvalible = await this.checkTeacherAvailabilityWholeSchoolYear(
+      createManyLessonsDto.employeeId,
+      createManyLessonsDto.substituteEmployeeId,
+      createManyLessonsDto.date,
+      createManyLessonsDto.schoolHourId,
+    );
 
-    if (checkTeachers.length !== 0)
+    if (!teacherAvalible)
       throw new BadRequestException(
         'This teacher already has a class at this time',
       );
@@ -135,6 +64,68 @@ export class LessonsService {
     }
 
     return await this.prisma.lesson.createMany({ data: lessons });
+  }
+
+  private async checkTeacherAvailability(
+    employeeId: string | null,
+    substituteEmployeeId: string | null,
+    reqDate: string,
+    schoolHourId: string,
+  ) {
+    const date = moment(reqDate)
+      .utcOffset(0)
+      .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+      .toISOString();
+
+    const checkAvalible = await this.prisma.lesson.findMany({
+      where: {
+        OR: [
+          { employeeId: employeeId ?? substituteEmployeeId },
+          { substituteEmployeeId: substituteEmployeeId ?? employeeId },
+        ],
+        AND: [
+          { date: { equals: date } },
+          {
+            schoolHourId: {
+              equals: schoolHourId,
+            },
+          },
+        ],
+      },
+    });
+
+    return checkAvalible.length === 0;
+  }
+
+  private async checkTeacherAvailabilityWholeSchoolYear(
+    employeeId: string | null,
+    substituteEmployeeId: string | null,
+    reqDate: string,
+    schoolHourId: string,
+  ) {
+    const date = moment(reqDate)
+      .utcOffset(0)
+      .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+      .toISOString();
+
+    const checkAvalible = await this.prisma.lesson.findMany({
+      where: {
+        OR: [
+          { employeeId: employeeId ?? substituteEmployeeId },
+          { substituteEmployeeId: substituteEmployeeId ?? employeeId },
+        ],
+        AND: [
+          { date: { gte: date } },
+          {
+            schoolHourId: {
+              equals: schoolHourId,
+            },
+          },
+        ],
+      },
+    });
+
+    return checkAvalible.length === 0;
   }
 
   async getLessonsByClassAndDateRange(
